@@ -1,2 +1,2 @@
-# yihong0618.github.io
+# yihong0618.github.io/blog
 blog
