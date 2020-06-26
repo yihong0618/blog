@@ -1,5 +1,5 @@
 [build]
-    command = "yarn run ci"
+    command = "yarn build"
     publish = "public"
 
 [build.processing.css]
