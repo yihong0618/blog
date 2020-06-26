@@ -2,8 +2,8 @@ const path = require("path");
 
 module.exports = {
   siteMetadata: {
-    title: "Dan Palmer",
-    siteUrl: "https://danpalmer.me",
+    title: "Yi hong",
+    siteUrl: "https://yihong0618.github.io/blog",
     description: "Personal site and blog",
   },
   plugins: [
@@ -101,7 +101,7 @@ module.exports = {
     },
     "gatsby-transformer-sharp",
     "gatsby-plugin-sharp",
-    "gatsby-redirect-from",
+    //"gatsby-redirect-from",
     "gatsby-plugin-sitemap",
     {
       resolve: "gatsby-plugin-robots-txt",
@@ -158,7 +158,7 @@ module.exports = {
               }
             `,
             output: "/rss.xml",
-            title: "Dan Palmer",
+            title: "Yi Hong",
           },
         ],
       },

@@ -30,7 +30,11 @@ export default ({ data }) => {
                我是伊洪，常用名yihong0618
             </p>
             <p>
-               2018年从数据分析师正式转行成为程序员，热爱编程，偏爱Python
+               2015年从机械行业转行互联网游戏行业，
+               2018年从数据分析师正式转行成为程序员，
+               热爱编程，偏爱Python，
+               热爱游戏，偏爱任天堂，
+               热爱跑步，跑龄23年，多次完成马拉松
             </p>
             <ul className="list pl0 b pt3">
               <li className="fl mr3">
