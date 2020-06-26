@@ -34,7 +34,7 @@ export default ({ data }) => {
                2018年从数据分析师正式转行成为程序员，
                热爱编程，偏爱Python，
                热爱游戏，偏爱任天堂，
-               热爱跑步，跑龄23年，多次完成马拉松
+               热爱跑步，跑龄23年，跑过几次马拉松，PB 4小时1分钟
             </p>
             <ul className="list pl0 b pt3">
               <li className="fl mr3">

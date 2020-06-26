@@ -11,7 +11,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import styles from "./running.module.scss";
 
 const MAPBOX_TOKEN =
-  "pk.eyJ1IjoiZGFuLXBhbG1lciIsImEiOiJjazhtNTV6czkwNTFiM2VxZmMyajNuNW1vIn0.N5DKOkyvPB9OCgKLSuwyMA";
+  "pk.eyJ1IjoieWlob25nMDYxOCIsImEiOiJja2J3M28xbG4wYzl0MzJxZm0ya2Fua2p2In0.PNKfkeQwYuyGOTT_x9BJ4Q";
 
 // Page
 
@@ -31,13 +31,14 @@ export default ({ data }) => {
                 我用app记录自己跑步8年有余，下面列表展示的是今年的数据
               </p>
               <p>
-                Runs are tracked with{" "}
+                现在我用NRC记录自己跑步{" "}
                 <a className="dark-gray b" href="https://www.nike.com/nrc-app">
                   Nike Run Club
                 </a>{" "}
               </p>
             </section>
             <section>
+              <Stat value={2019} description={"跑步旅程"} />
               <Stat value={data.runs.totalCount} description={"Runs"} />
               <Stat
                 value={calcMetricTotal(runs, "distance")}
@@ -98,8 +99,8 @@ const RunMap = ({ runs }) => {
   const [viewport, setViewport] = useState({
     width: "100%",
     height: 400,
-    latitude: 51.543,
-    longitude: 0.01,
+    latitude: 38.862,
+    longitude: 121.514,
     zoom: 11.5,
   });
 

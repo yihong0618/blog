@@ -4,6 +4,7 @@ import logging
 import os.path
 import sys
 import argparse
+import time
 
 import httpx
 
@@ -37,10 +38,20 @@ class Nike:
         return self.request("activities/after_time", timestamp)
 
     def get_activities_since_id(self, activity_id):
-        return self.request("activities/after_id", activity_id)
+        try:
+            return self.request("activities/after_id", activity_id)
+        except:
+            print("retry")
+            time.sleep(3)
+            return self.request("activities/after_id", activity_id)
 
     def get_activity(self, activity_id):
-        return self.request("activity", f"{activity_id}?metrics=ALL")
+        try:
+            return self.request("activity", f"{activity_id}?metrics=ALL")
+        except:
+            print("retry")
+            time.sleep(3)
+            return self.request("activity", f"{activity_id}?metrics=ALL")
 
     def request(self, resource, selector):
         url = f"{BASE_URL}/{resource}/{selector}"
