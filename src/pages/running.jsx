@@ -38,7 +38,7 @@ export default ({ data }) => {
               </p>
             </section>
             <section>
-              <Stat value={2019} description={"跑步旅程"} />
+              <Stat value={2020} description={"跑步旅程"} />
               <Stat value={data.runs.totalCount} description={"Runs"} />
               <Stat
                 value={calcMetricTotal(runs, "distance")}
@@ -296,7 +296,7 @@ const calculateRunStreak = (runs) => {
   for (let i = 1; i < runs.nodes.length; i++) {
     const day = roundDate(new Date(runs.nodes[i].start_epoch_ms));
     const diff = lastDay - day;
-    if (diff === oneDay || skippingRestDay) {
+    if (diff === oneDay || diff === 0 || skippingRestDay) {
       lastDay = day;
       count += 1;
       skippingRestDay = false;
