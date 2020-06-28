@@ -45,9 +45,10 @@ jobs:
           python scripts/nike_sync.py ${{ secrets.N_TOKEN }}
 
       - name: Push new runs
-        uses: github-actions-x/commit@v2.5
+        uses: github-actions-x/commit@v2.6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "Add new runs"
           files: data/activities/
-          name: Yi Hong 
+          name: yihong0618 
+          email: zouzou0208@gmail.com
