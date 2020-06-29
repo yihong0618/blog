@@ -121,7 +121,7 @@ const RunMap = ({ runs }) => {
   return (
     <ReactMapGL
       {...viewport}
-      mapStyle="mapbox://styles/mapbox/dark-v9"
+      mapStyle="mapbox://styles/mapbox/dark-v9?optimize=true"
       onViewportChange={setViewport}
       mapboxApiAccessToken={MAPBOX_TOKEN}
     >
@@ -296,7 +296,10 @@ const calculateRunStreak = (runs) => {
   for (let i = 1; i < runs.nodes.length; i++) {
     const day = roundDate(new Date(runs.nodes[i].start_epoch_ms));
     const diff = lastDay - day;
-    if (diff === oneDay || diff === 0 || skippingRestDay) {
+    if (diff === 0) {
+      continue;
+    }
+    if (diff === oneDay || skippingRestDay) {
       lastDay = day;
       count += 1;
       skippingRestDay = false;
