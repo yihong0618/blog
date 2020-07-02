@@ -156,7 +156,6 @@ const RunTable = ({ runs }) => (
         <tr>
           <th></th>
           <th>KM</th>
-          <th>KCAL</th>
           <th>Pace</th>
           <th>BPM</th>
           <th></th>
@@ -176,10 +175,6 @@ const RunRow = ({ run }) => {
     (x) => x.summary === "total" && x.metric === "distance"
   );
 
-  const calories = run.summaries.find(
-    (x) => x.summary === "total" && x.metric === "calories"
-  );
-
   const pace = run.summaries.find(
     (x) => x.summary === "mean" && x.metric === "pace"
   );
@@ -194,7 +189,6 @@ const RunRow = ({ run }) => {
     <tr className={styles.runRow}>
       <td>{titleForRun(run)}</td>
       <td>{distance && distance.value.toFixed(2)}</td>
-      <td>{calories && calories.value.toFixed(0)}</td>
       {pace && (
         <td>
           {paceParts.minutes}:
