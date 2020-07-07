@@ -62,7 +62,7 @@
     "ci": "yarn run check && yarn run build && yarn run test"
   },
   "engines": {
-    "node": ">=0.10.3 <0.12"
+    "node": ">=10.0.0"
   },
   "repository": {
     "type": "git",
