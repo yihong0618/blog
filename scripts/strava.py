@@ -197,7 +197,7 @@ def make_new_gpxs(files):
     gpx_files = os.listdir(GPX_FOLDER)
     for f in gpx_files:
         upload_gpx(GPX_FOLDER + "/" + f)
-        print(gpx_files+"upload")
+        print(f +" uploaded")
 
 
 if __name__ == "__main__":
