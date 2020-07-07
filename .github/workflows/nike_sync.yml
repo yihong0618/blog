@@ -8,6 +8,7 @@ on:
       - master
     paths:
       - scripts/nike_sync.py
+      - scripts/strava.py
       - requirements.txt
 
 jobs:
@@ -43,6 +44,10 @@ jobs:
         run: |
           source venv/bin/activate
           python scripts/nike_sync.py ${{ secrets.N_TOKEN }}
+      - name: Generate New gpx
+        run: |
+          source venv/bin/activate
+          python scripts/strava.py ${{ secrets.S_CLIENT_ID }} ${{ secrets.S_CLIENT_SECRET }} ${{ secrets.S_REFRESH_TOKEN}}
 
       - name: Push new runs
         uses: github-actions-x/commit@v2.6

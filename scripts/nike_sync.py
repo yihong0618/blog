@@ -63,7 +63,7 @@ class Nike:
 
 def run(refresh_token):
     nike = Nike(refresh_token)
-    last_id = get_last_activity_id()
+    last_id = get_last_id()
 
     logger.info(f"Running from ID {last_id}")
 
@@ -113,21 +113,14 @@ def activity_name(activity):
         return activity["type"].title()
 
 
-def get_last_activity_id():
-    activities = []
-
-    for filename in os.listdir(OUTPUT_DIR):
-        with open(os.path.join(OUTPUT_DIR, filename)) as f:
-            data = json.load(f)
-            activities.append((data["end_epoch_ms"], data["id"]))
-
-    if not activities:
-        return None
-
-    last_run_ms, last_id = sorted(activities, reverse=True)[0]
-    last_run = datetime.datetime.fromtimestamp(last_run_ms / 1000)
-    logger.info(f"Last update from {last_run}")
-    return last_id
+def get_last_id():
+    file_names = os.listdir(OUTPUT_DIR)
+    file_names.sort()
+    file_name = file_names[-1]
+    with open(os.path.join(OUTPUT_DIR, file_name)) as f:
+        data = json.load(f)
+    logger.info(f"Last update from {data['id']}")
+    return data["id"]
 
 
 def sanitise_json(d):
