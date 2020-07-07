@@ -195,8 +195,9 @@ def make_new_gpxs(files):
         if parsed_data:
             save_gpx(parsed_data, json_data["id"])
     gpx_files = os.listdir(GPX_FOLDER)
-    upload_gpx(GPX_FOLDER + "/" + gpx_files[0])
-    print(gpx_files)
+    for f in gpx_files:
+        upload_gpx(GPX_FOLDER + "/" + f)
+        print(gpx_files+"upload")
 
 
 if __name__ == "__main__":
