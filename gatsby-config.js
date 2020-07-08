@@ -2,8 +2,8 @@ const path = require("path");
 
 module.exports = {
   siteMetadata: {
-    title: "Yi hong",
-    siteUrl: "https://yihong0618.github.io/blog",
+    title: "Yi Hong",
+    siteUrl: "https://yihong.run",
     description: "Personal site and blog",
   },
   plugins: [
