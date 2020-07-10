@@ -44,6 +44,7 @@ jobs:
         run: |
           source venv/bin/activate
           python scripts/nike_sync.py ${{ secrets.N_TOKEN }}
+
       - name: Generate New gpx
         run: |
           source venv/bin/activate
@@ -55,5 +56,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "Add new runs"
           files: data/activities/
+          rebase: 'true'
           name: yihong0618 
           email: zouzou0208@gmail.com
