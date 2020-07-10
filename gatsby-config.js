@@ -36,33 +36,9 @@ module.exports = {
               withWebp: { quality: 80 },
             },
           },
-          {
-            resolve: "gatsby-remark-embed-youtube",
-            options: {
-              width: 600,
-              height: 338, // 16:9
-            },
-          },
-          {
-            resolve: "gatsby-remark-vscode",
-            options: {
-              theme: "GitHub Plus",
-              // To get extensions that aren't distributed on NPM, go to the
-              // VSCode Marketplace, click "Download Extension" (not "Install")
-              // and drop the .vsix file into the vendor directory.
-              extensions: [
-                path.resolve("./vendor/justusadam.language-haskell-2.7.0.vsix"),
-                path.resolve("./vendor/thenikso.github-plus-theme-1.2.1.vsix"),
-                path.resolve(
-                  "./vendor/kumar-harsh.graphql-for-vscode-1.15.3.vsix"
-                ),
-              ],
-            },
-          },
         ],
       },
     },
-    "gatsby-plugin-netlify",
     {
       resolve: "gatsby-source-filesystem",
       options: {
