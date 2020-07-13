@@ -1,4 +1,4 @@
-const last_sync = '2020-07-13 18:09:46';
+const last_sync = '2020-07-13 18:34:33';
 const strava_athlete = {
   "id": 58330365,
   "firstname": "\u4f0a",
