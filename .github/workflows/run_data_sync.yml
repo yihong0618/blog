@@ -9,6 +9,7 @@ on:
     paths:
       - scripts/nike_sync.py
       - scripts/strava.py
+      - scripts/gen_json.py
       - requirements.txt
 
 jobs:
@@ -53,7 +54,7 @@ jobs:
       - name: Generate new data files
         run: |
           source venv/bin/activate
-          python scripts/geo_json.py ${{ secrets.S_CLIENT_ID }} ${{ secrets.S_CLIENT_SECRET }} ${{ secrets.S_REFRESH_TOKEN}}
+          python scripts/gen_json.py ${{ secrets.S_CLIENT_ID }} ${{ secrets.S_CLIENT_SECRET }} ${{ secrets.S_REFRESH_TOKEN}}
 
       - name: Push new runs
         uses: github-actions-x/commit@v2.6
