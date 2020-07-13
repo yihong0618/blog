@@ -28,6 +28,7 @@ def run(client_id, client_secret, refresh_token):
         f.write("const activities = ")
         json.dump(activities_list, f, indent=2)
         f.write(";\n")
+        f.write("\n")
         f.write("export {activities, last_sync, strava_athlete};\n")
 
 if __name__ == "__main__":
