@@ -23,4 +23,5 @@ gpxpy==1.4.2
 stravalib==0.10.2
 arrow
 geopy
+polyline
 sqlalchemy
