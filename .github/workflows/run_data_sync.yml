@@ -45,17 +45,22 @@ jobs:
           source venv/bin/activate
           python scripts/nike_sync.py ${{ secrets.N_TOKEN }}
 
-      - name: Generate New gpx
+      - name: Generate New gpx upload to strava
         run: |
           source venv/bin/activate
           python scripts/strava.py ${{ secrets.S_CLIENT_ID }} ${{ secrets.S_CLIENT_SECRET }} ${{ secrets.S_REFRESH_TOKEN}}
+
+      - name: Generate new data files
+        run: |
+          source venv/bin/activate
+          python scripts/geo_json.py ${{ secrets.S_CLIENT_ID }} ${{ secrets.S_CLIENT_SECRET }} ${{ secrets.S_REFRESH_TOKEN}}
 
       - name: Push new runs
         uses: github-actions-x/commit@v2.6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "Add new runs"
-          files: data/activities/
+          files: data/activities/ src/static/
           rebase: 'true'
           name: yihong0618 
           email: zouzou0208@gmail.com

@@ -21,3 +21,5 @@ sniffio==1.1.0            # via httpx
 urllib3==1.25.8           # via httpx
 gpxpy==1.4.2
 stravalib==0.10.2
+arrow
+geopy

@@ -51,14 +51,19 @@ const YearsStat = ({ runs }) => {
   return (
     <div className="fl w-100 w-30-l pb5 pr5-l">
       <section className="pb4">
-        <p>我用app记录自己跑步8年有余，下面列表展示的是今年的数据</p>
+        {/* TODO 2020作为变量 */}
+        <p>我用app记录自己跑步8年有余，下面列表展示的是{"2020"}的数据</p>
         <p>
           现在我用NRC记录自己跑步{" "}
           <a className="dark-gray b" href="https://www.nike.com/nrc-app">
             Nike Run Club
           </a>{" "}
+          希望能激励自己前行，不要停下来。这个展示也是我学习React的第一个项目，
+          希望自己有所成长。
+          The best is yet to come.
         </p>
       </section>
+      <hr color={"red"} />
       {yearsArr.map((year) => (
         <YearStat runs={runs} year={year} />
       ))}
@@ -105,14 +110,14 @@ const YearStat = ({ runs, year }) => {
         <Stat value={avgPace} description="Avg Pace" />
         <Stat
           value={`${streak} day`}
-          description="streak"
+          description="Streak"
           className="mb0 pb0"
         />
         {hasHeartRate && (
           <Stat value={avgHeartRate} description="Avg Heart Rate" />
         )}
       </section>
-      <hr />
+      <hr color={"red"} />
     </div>
   );
 };
