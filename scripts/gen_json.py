@@ -18,8 +18,6 @@ def run(client_id, client_secret, refresh_token):
 
     athlete, activities_list = generator.load()
     with open(JSON_FILE, "w") as f:
-        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        f.write(f"const last_sync = '{now}';\n")
 
         f.write("const strava_athlete = ")
         json.dump(athlete, f, indent=2)
@@ -29,7 +27,7 @@ def run(client_id, client_secret, refresh_token):
         json.dump(activities_list, f, indent=2)
         f.write(";\n")
         f.write("\n")
-        f.write("export {activities, last_sync, strava_athlete};\n")
+        f.write("export {activities, strava_athlete};\n")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

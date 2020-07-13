@@ -60,7 +60,7 @@ const YearsStat = ({ runs }) => {
           </a>{" "}
           希望能激励自己前行，不要停下来。这个展示也是我学习React的第一个项目，
           希望自己有所成长。
-          The best is yet to come.
+          <p>The best is yet to come.</p>
         </p>
       </section>
       <hr color={"red"} />
