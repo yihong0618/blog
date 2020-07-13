@@ -1,4 +1,3 @@
-const last_sync = '2020-07-13 22:08:49';
 const strava_athlete = {
   "id": 58330365,
   "firstname": "\u4f0a",
@@ -26544,4 +26543,4 @@ const activities = [
   }
 ];
 
-export {activities, last_sync, strava_athlete};
+export {activities, strava_athlete};
