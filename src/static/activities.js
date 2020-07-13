@@ -1,4 +1,4 @@
-const last_sync = '2020-07-13 10:57:09';
+const last_sync = '2020-07-13 15:22:42';
 const strava_athlete = {
   "id": 58330365,
   "firstname": "\u4f0a",
@@ -701,22 +701,6 @@ const activities = [
     "average_heartrate": null,
     "average_speed": 3.172,
     "streak": 1
-  },
-  {
-    "strava_id": 3690936910,
-    "athlete_id": 58330365,
-    "name": "Weight Training",
-    "distance": 4000.0,
-    "moving_time": "0:25:00",
-    "elapsed_time": "0:25:00",
-    "total_elevation_gain": 0.0,
-    "type": "WeightTraining",
-    "start_date": "2012-12-04 12:11:32+00:00",
-    "start_date_local": "2012-12-04 20:11:32",
-    "location_country": null,
-    "summary_polyline": null,
-    "average_heartrate": null,
-    "average_speed": 2.667
   },
   {
     "strava_id": 3690936920,
@@ -2689,38 +2673,6 @@ const activities = [
     "average_heartrate": null,
     "average_speed": 3.467,
     "streak": 1
-  },
-  {
-    "strava_id": 3690934778,
-    "athlete_id": 58330365,
-    "name": "Deshengyingzi",
-    "distance": 2471.0,
-    "moving_time": "0:13:15",
-    "elapsed_time": "0:13:15",
-    "total_elevation_gain": 7.7,
-    "type": "Ride",
-    "start_date": "2013-05-05 12:34:20+00:00",
-    "start_date_local": "2013-05-05 20:34:20",
-    "location_country": null,
-    "summary_polyline": "anv}FoaeoVGYMGQ?QIGIEYAm@DkBLORKp@Kp@]vB_CXUjBw@tA[t@Gd@Cj@Jh@Af@JbALr@A^Md@Wb@_@Vc@L]b@}AFgCCg@?sAGgBB_BOiCAkAI}@?u@CaABaAAOEOKUQIOEe@?g@Hg@@OD}@Ja@LKC]OMAgARyABy@V]Lq@d@ODw@`@c@Z_@TYXw@Ra@b@mAt@{@Xu@`@}Ap@g@^i@j@q@XYRm@XqAz@KNCJ?TDTd@pANp@\\fAFb@l@rBFZbBjFRXx@l@rAr@",
-    "average_heartrate": null,
-    "average_speed": 3.108
-  },
-  {
-    "strava_id": 3690934775,
-    "athlete_id": 58330365,
-    "name": "Deshengyingzi",
-    "distance": 3018.0,
-    "moving_time": "0:12:45",
-    "elapsed_time": "0:12:45",
-    "total_elevation_gain": 34.0,
-    "type": "Ride",
-    "start_date": "2013-05-06 13:45:50+00:00",
-    "start_date_local": "2013-05-06 21:45:50",
-    "location_country": null,
-    "summary_polyline": "yov}FuaeoVWKO?GAiB{@{@Mu@QWCUDUNUf@AR@`@FXFLPPZLTF`ANnAXJETMTe@FW?[EWCMMSMKWKe@Mm@E_ASa@?KDMFMTOf@?h@@LZb@^Pv@Hh@Nn@HPBVETSLQJ[B[A[IWSWQIg@KsAMi@KSAM@a@ZGNCV@\\Lh@LRJJLFh@LpBZVCZOVc@FS@k@EYSYUKOEw@EkB]SBSPOTGVCV@ZDLLVPJZLfB`@f@HP?LEZSHQFY@o@GWMSKGUMUGuCe@YDKJIJQh@?l@BPFP\\ZTHdB`@b@HX?TERQRi@Ba@Ci@KSMMSKYIy@GgAS_@CSHMLQ\\CPA\\Hb@LTPRNFVFjC`@RARILMVk@BUA]KYKOMIWMy@KmBa@S@WLIJIXCPBp@JZHLPNXJ~@JrAVRALCPOXe@BUAQOo@OU",
-    "average_heartrate": null,
-    "average_speed": 3.945
   },
   {
     "strava_id": 3690934768,
@@ -24568,22 +24520,6 @@ const activities = [
     "streak": 2
   },
   {
-    "strava_id": 3454583280,
-    "athlete_id": 58330365,
-    "name": "\u6668\u95f4\u884c\u8d70",
-    "distance": 2191.0,
-    "moving_time": "0:26:06",
-    "elapsed_time": "0:49:35",
-    "total_elevation_gain": 9.4,
-    "type": "Walk",
-    "start_date": "2020-04-27 23:53:59+00:00",
-    "start_date_local": "2020-04-28 07:53:59",
-    "location_country": null,
-    "summary_polyline": "mejlFwpxdVAk@BSDGZMKKQEQGGICK?OBQXs@?]IY]a@Qc@U_@GFEN@\\HKIJK?^JAH",
-    "average_heartrate": 111.8,
-    "average_speed": 1.399
-  },
-  {
     "strava_id": 3507876568,
     "athlete_id": 58330365,
     "name": "Lingshui",
@@ -24635,22 +24571,6 @@ const activities = [
     "streak": 1
   },
   {
-    "strava_id": 3454583031,
-    "athlete_id": 58330365,
-    "name": "\u6668\u95f4\u884c\u8d70",
-    "distance": 1530.5,
-    "moving_time": "0:18:48",
-    "elapsed_time": "0:23:03",
-    "total_elevation_gain": 23.4,
-    "type": "Walk",
-    "start_date": "2020-05-08 23:42:25+00:00",
-    "start_date_local": "2020-05-09 07:42:25",
-    "location_country": null,
-    "summary_polyline": "icjlFieudVZOVG\\Ez@Al@E`@I^QKsAEiBYmBEe@?kB]gBMiAUwD?cCa@eDK}DIi@]qAIy@AcDBQPg@B[GaB?oBKaBEsFGyB?mBE{DC]I]Fk@EeA?wACe@Rg@Bg@AGECABBJ",
-    "average_heartrate": 121.4,
-    "average_speed": 1.357
-  },
-  {
     "strava_id": 3454582942,
     "athlete_id": 58330365,
     "name": "\u508d\u665a\u8dd1\u6b65",
@@ -24668,22 +24588,6 @@ const activities = [
     "streak": 1
   },
   {
-    "strava_id": 3454582890,
-    "athlete_id": 58330365,
-    "name": "\u5348\u95f4\u884c\u8d70",
-    "distance": 2214.2,
-    "moving_time": "0:23:32",
-    "elapsed_time": "0:30:27",
-    "total_elevation_gain": 43.2,
-    "type": "Walk",
-    "start_date": "2020-05-11 04:10:58+00:00",
-    "start_date_local": "2020-05-11 12:10:58",
-    "location_country": null,
-    "summary_polyline": "kdjlFmoxdVhAm@ZUlA{AjAkBdBkBpBuCtBuBX[PYL]ZkBd@qAQ[iAcBs@wASWs@s@K_@qA_Ag@e@iBcCeCwCgAuAg@e@a@^_@f@GTAb@@lCHtC@pBLzFAbCLpG@dBLbCANELKHQJ[FcA@G?CBIb@@XPL^HHLYSKSM_@EW@E`@I`ACd@KOa@g@w@OKKAi@D",
-    "average_heartrate": 122.4,
-    "average_speed": 1.568
-  },
-  {
     "strava_id": 3454582866,
     "athlete_id": 58330365,
     "name": "\u6668\u95f4\u8dd1\u6b65",
@@ -24699,54 +24603,6 @@ const activities = [
     "average_heartrate": 170.2,
     "average_speed": 2.417,
     "streak": 1
-  },
-  {
-    "strava_id": 3454582922,
-    "athlete_id": 58330365,
-    "name": "\u6668\u95f4\u884c\u8d70",
-    "distance": 2015.2,
-    "moving_time": "0:24:05",
-    "elapsed_time": "0:25:03",
-    "total_elevation_gain": 31.4,
-    "type": "Walk",
-    "start_date": "2020-05-11 23:49:17+00:00",
-    "start_date_local": "2020-05-12 07:49:17",
-    "location_country": null,
-    "summary_polyline": "{fjlFidudV~@WdC]zAUnAG@g@CaCGwAUgBGcBc@gESkDEaB[sC[_FGc@]wBGyBOwDAuESsBG_AIyFB_ADSTo@Bc@G}AK_BAe@B]PiA@g@CYKw@SgE@w@J{@WMGQGyBMsBEUISo@_Ag@i@AAAB",
-    "average_heartrate": 122.6,
-    "average_speed": 1.395
-  },
-  {
-    "strava_id": 3454582949,
-    "athlete_id": 58330365,
-    "name": "\u5348\u95f4\u884c\u8d70",
-    "distance": 3636.8,
-    "moving_time": "0:39:13",
-    "elapsed_time": "0:39:13",
-    "total_elevation_gain": 67.0,
-    "type": "Walk",
-    "start_date": "2020-05-12 04:15:07+00:00",
-    "start_date_local": "2020-05-12 12:15:07",
-    "location_country": null,
-    "summary_polyline": "qajlFiqxdVp@w@hCaDlAsAjCuDxCcD\\U\\GP@n@NZHNHJJLT`@pANp@NrARx@b@|A^xBNl@b@hAj@bAP\\b@tBp@rATp@h@jCN`BHl@`@hBXfBj@`CLvAM?YGuBaAwAc@g@KcAMk@CeCG{@FtBElEXh@J`AXt@ZfAl@VF@EAw@KaAc@aC_@aB{@wEQqBUoA_@mAqAcDa@oAw@sBUg@e@w@Oa@Ok@O_A_@{ASmBOe@QWUMa@GWBSJa@f@cAvA{@p@o@p@oBvCiApAe@^i@JWLYRYX]h@YdAIRMLOFQ@MEKMIUGe@IoAI}BGa@GMYWWc@SQ",
-    "average_heartrate": 124.4,
-    "average_speed": 1.546
-  },
-  {
-    "strava_id": 3454582849,
-    "athlete_id": 58330365,
-    "name": "\u5348\u95f4\u884c\u8d70",
-    "distance": 2024.8,
-    "moving_time": "0:23:02",
-    "elapsed_time": "0:24:29",
-    "total_elevation_gain": 35.2,
-    "type": "Walk",
-    "start_date": "2020-05-13 04:03:18+00:00",
-    "start_date_local": "2020-05-13 12:03:18",
-    "location_country": null,
-    "summary_polyline": "wdjlFc{xdVGu@A_A@kCGyB@_DGiFYoDKiI@WDSR[\\QPCT?N@vCvDz@z@nCxDZXl@b@nBtBb@r@j@nAPn@@`@YfAEZAZBh@?VIZOXs@z@gA`AkA`AWb@o@fBQXuClCo@z@u@pAWVI@OAIEKQIWEu@BsAAo@Ag@GOa@c@Sa@MKOCk@@YA",
-    "average_heartrate": 117.9,
-    "average_speed": 1.465
   },
   {
     "strava_id": 3454732845,
@@ -24851,22 +24707,6 @@ const activities = [
     "streak": 4
   },
   {
-    "strava_id": 3690924611,
-    "athlete_id": 58330365,
-    "name": "Running 5/25/20 7:48 pm",
-    "distance": 1910.2,
-    "moving_time": "0:25:58",
-    "elapsed_time": "0:51:06",
-    "total_elevation_gain": 0.0,
-    "type": "Walk",
-    "start_date": "2020-05-18 11:52:55+00:00",
-    "start_date_local": "2020-05-18 19:52:55",
-    "location_country": null,
-    "summary_polyline": "_ielFsatdVQ@g@RU@OCfBGJETUNI",
-    "average_heartrate": 93.0,
-    "average_speed": 1.226
-  },
-  {
     "strava_id": 3507876252,
     "athlete_id": 58330365,
     "name": "Lingshui",
@@ -24882,22 +24722,6 @@ const activities = [
     "average_heartrate": 172.5,
     "average_speed": 2.719,
     "streak": 5
-  },
-  {
-    "strava_id": 3690924586,
-    "athlete_id": 58330365,
-    "name": "\u6668\u95f4\u884c\u8d70",
-    "distance": 1784.7,
-    "moving_time": "0:24:40",
-    "elapsed_time": "0:31:31",
-    "total_elevation_gain": 30.6,
-    "type": "Walk",
-    "start_date": "2020-05-19 00:01:01+00:00",
-    "start_date_local": "2020-05-19 08:01:01",
-    "location_country": null,
-    "summary_polyline": "g{ilF}iudVIwBQsCGyA[uAKk@KuBCcBKkBM{AYiB]_GW{AEg@?YBOFGTIDMSmAEy@@gBEwAA}BUyF?iACcDIqF?yANcBI{AHmAJu@ECM?ACG_AOgAACI@?gAA?OTEACEGsB?qBC]IOg@i@Ui@q@U",
-    "average_heartrate": 119.0,
-    "average_speed": 1.206
   },
   {
     "strava_id": 3507876277,
@@ -24932,22 +24756,6 @@ const activities = [
     "average_heartrate": 170.4,
     "average_speed": 2.73,
     "streak": 6
-  },
-  {
-    "strava_id": 3690924576,
-    "athlete_id": 58330365,
-    "name": "\u6668\u95f4\u884c\u8d70",
-    "distance": 2007.5,
-    "moving_time": "0:25:08",
-    "elapsed_time": "0:26:31",
-    "total_elevation_gain": 34.6,
-    "type": "Walk",
-    "start_date": "2020-05-19 23:58:01+00:00",
-    "start_date_local": "2020-05-20 07:58:01",
-    "location_country": null,
-    "summary_polyline": "{ejlFgdudVn@IdAYhBO~B_@RGJKDM@OEa@m@gFSmEYkCQyBEsBOiCScBKaCu@uGMqBAgAD{A?}DE}@QoBOsE@eEKeF@g@PmAAYMk@AOB_BJe@KEEy@UuAEu@CCKAEGQy@AW@aCEm@IQe@e@a@q@YQa@@",
-    "average_heartrate": 114.8,
-    "average_speed": 1.331
   },
   {
     "strava_id": 3507876216,
@@ -26715,6 +26523,23 @@ const activities = [
     "summary_polyline": "qhelFkctdV?YUIMTShBGjBPJd@BFY@s@GWLQDUSOVcAQMSAMPDVIROn@IdBTVh@?DU@q@A[@WRgAK[WKSDKVCVQn@IjBNLRDT?NO@gBFULSBYIWQIUBEr@IXMTGX?ZEVBZJRf@CHSBUBo@DWAs@F[AYSKS?KRBX]dAAn@GX@XPNT@REH[BY?YF[?YF]GS?[QOUFKRGv@EVKRAlAFVh@@LQBYAq@DYJQ?WDYEUOQSCWrA?VIXIpAHPd@BLWFY?u@D[@kAGUQIQDGTAZUpAAr@?XJPb@BRu@JuAFY?]EWc@OORAX[bAAXEv@FXf@DPEJU@s@CWLq@@w@SKSCKP?VORKp@IdBPJVBPIHgAAUNu@BWMk@UGOP[fBBV?\\On@RFj@CBYJWFWDw@DWCu@YIUBg@dB@z@CTBZPFf@@PQHWLUJ[JS?[JQFU\\c@NEl@p@XLj@r@TFb@XNPDX?Z",
     "average_heartrate": 165.1,
     "average_speed": 3.035,
+    "streak": 60
+  },
+  {
+    "strava_id": 3755581997,
+    "athlete_id": 58330365,
+    "name": "\u508d\u665a\u8dd1\u6b65",
+    "distance": 7088.5,
+    "moving_time": "0:38:05",
+    "elapsed_time": "0:38:05",
+    "total_elevation_gain": 38.8,
+    "type": "Run",
+    "start_date": "2020-07-13 11:29:45+00:00",
+    "start_date_local": "2020-07-13 19:29:45",
+    "location_country": null,
+    "summary_polyline": "_oelFgdtdVLWCYDOAWRQJSLK@YQGMQOKOOUKQMOGg@Me@ISCg@SkA[e@USCSGy@]oAYg@Si@Mu@a@mA[S@ONKTGXMTIVMTIVUd@Yf@c@b@OJWH_A?}@EQGQ?g@CWBOFU?MMWEy@Pk@Fy@^w@n@ORSFU?u@r@IVML{@PUJORKRQNUBg@POJy@\\qAVqA^OJSCe@HW@OKk@CQI_AKk@KOIg@Kg@JUIk@A{@[YIMS@[FYG]Uo@C[?]@w@LoBJQFWKq@DWBeBCWGWAYOmACu@G[M_C@q@IoAB[IkBCyAIo@a@aB]g@QQYi@_@y@KQAWLQ\\a@PKJWNMNGb@c@dA{@rAsA`Aw@Z_@Pm@LSFUb@}@h@yAPo@p@yAv@wCNMxA}CRq@n@sAt@_Cb@cAZmA^k@X_@RMXg@t@k@HWb@]NQNIj@{@NQf@[b@]f@SRKj@IRGPITCRGPIRGNOVGP@j@MVCpABlAQd@RPLRRb@X`@^NHnA|@NRRHNLTHt@t@FZ?ZTl@NPMl@POTITAPMTAf@X~ArAd@T^VNPRJPPt@d@v@l@NLPJLRv@d@\\\\jAp@b@^dAn@`@\\PJPNLTRBJNp@l@hAv@b@VTHd@^h@Z^ZRLp@p@f@XPDh@VrArA^RNPPDPPh@XPNb@P`@\\r@x@LPFXZd@R?f@HRLfA|@d@Tb@\\lAz@RJRR`@Zf@VNLjBrANPhAp@^^RLJNp@n@j@z@Vl@LTZjA`@~@d@~ALp@LVFZ@\\Hn@HV`@`ALn@LPPH\\`@`AhAb@XTHR@p@^b@^PFb@\\d@`@r@d@TJpBtAf@TTBf@Av@Zb@`@JPTj@P@RJR?PBJXd@VPR`@HNLf@XPAv@h@z@b@x@ZPNd@Pv@\\`@ZRD",
+    "average_heartrate": 151.6,
+    "average_speed": 3.102,
     "streak": 60
   }
 ];
