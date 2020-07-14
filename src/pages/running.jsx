@@ -1,7 +1,7 @@
-import React, { Fragment, useState, useEffect } from "react";
+import React, { Fragment, useState } from "react";
 import { Helmet } from "react-helmet";
 import * as mapboxPolyline from "@mapbox/polyline";
-import ReactMapGL, { Source, Layer, FlyToInterpolator } from "react-map-gl";
+import ReactMapGL, { Source, Layer } from "react-map-gl";
 import { ViewportProvider, useDimensions } from "react-viewport-utils";
 
 import Layout from "../components/layout";
@@ -21,6 +21,15 @@ export default () => {
     setYear(year);
     window.scroll(0, 0);
     setActivity(activities);
+    setViewport(
+      {
+        width: "100%",
+        height: 400,
+        latitude: 38.862,
+        longitude: 121.514,
+        zoom: 11.5,
+      }
+    )
   };
   const [runs, setActivity] = useState(activities);
   const [viewport, setViewport] = useState({
@@ -33,7 +42,7 @@ export default () => {
   const locateActivity = (run) => {
     // TODO maybe filter some activities in the future
     setActivity([run]);
-    const geoData = geoJsonForRuns([run], run.start_date_local.slice(0, 4));
+    const geoData = geoJsonForRuns([run], run .start_date_local.slice(0, 4));
     const startPoint = geoData.features[0].geometry.coordinates[0];
     setViewport({
       width: "100%",
@@ -175,13 +184,6 @@ const RunMap = ({ runs, year, viewport, setViewport }) => {
   year = year || "2020";
   const geoData = geoJsonForRuns(runs, year);
   const startPoint = geoData.features[0].geometry.coordinates[0];
-  // const [viewport, setViewport] = useState({
-  //   width: "100%",
-  //   height: 400,
-  //   latitude: 38.862,
-  //   longitude: 121.514,
-  //   zoom: 11.5,
-  // });
 
   const [lastWidth, setLastWidth] = useState(0);
 
