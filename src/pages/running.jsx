@@ -15,34 +15,53 @@ const MAPBOX_TOKEN =
 
 // Page
 
+const yearsArr = [
+  "2012",
+  "2013",
+  "2014",
+  "2015",
+  "2016",
+  "2017",
+  "2018",
+  "2019",
+  "2020",
+].reverse();
+
+const shenyangYearsArr = ["2012", "2013", "2014"]
+const DALIAN_STRAT_POINT = [38.862, 121.514];
+const SHENYANG_START_POINT = [41.78655, 123.31449];
+
 export default () => {
   const [year, setYear] = useState("2020");
+  let onStartPoint = shenyangYearsArr.includes(year) ? SHENYANG_START_POINT : DALIAN_STRAT_POINT;
+  const [runs, setActivity] = useState(activities);
+  const [viewport, setViewport] = useState({
+    width: "100%",
+    height: 400,
+    latitude: onStartPoint[0],
+    longitude: onStartPoint[1],
+    zoom: 11.5,
+  });
   const changeYear = (year) => {
     setYear(year);
+    onStartPoint = shenyangYearsArr.includes(year) ? SHENYANG_START_POINT : DALIAN_STRAT_POINT;
     window.scroll(0, 0);
     setActivity(activities);
     setViewport(
       {
         width: "100%",
         height: 400,
-        latitude: 38.862,
-        longitude: 121.514,
+        latitude: onStartPoint[0],
+        longitude: onStartPoint[1],
         zoom: 11.5,
       }
     )
   };
-  const [runs, setActivity] = useState(activities);
-  const [viewport, setViewport] = useState({
-    width: "100%",
-    height: 400,
-    latitude: 38.862,
-    longitude: 121.514,
-    zoom: 11.5,
-  });
+
   const locateActivity = (run) => {
     // TODO maybe filter some activities in the future
     setActivity([run]);
-    const geoData = geoJsonForRuns([run], run .start_date_local.slice(0, 4));
+    const geoData = geoJsonForRuns([run], run.start_date_local.slice(0, 4));
     const startPoint = geoData.features[0].geometry.coordinates[0];
     setViewport({
       width: "100%",
@@ -95,17 +114,6 @@ export default () => {
 
 const YearsStat = ({ runs, year, onClick }) => {
   // for short solution need to refactor
-  const yearsArr = [
-    "2012",
-    "2013",
-    "2014",
-    "2015",
-    "2016",
-    "2017",
-    "2018",
-    "2019",
-    "2020",
-  ].reverse();
   return (
     <div className="fl w-100 w-30-l pb5 pr5-l">
       <section className="pb4">
@@ -123,14 +131,17 @@ const YearsStat = ({ runs, year, onClick }) => {
       </section>
       <hr color={"red"} />
       {yearsArr.map((year) => (
-        <YearStat runs={runs} year={year} onClick={onClick} />
+        <YearStat key={year} runs={runs} year={year} onClick={onClick} />
       ))}
+      <YearStat key={year} runs={runs} year={"Total"} onClick={onClick} />
     </div>
   );
 };
 
 const YearStat = ({ runs, year, onClick }) => {
-  runs = runs.filter((run) => run.start_date_local.slice(0, 4) === year);
+  if (yearsArr.includes(year)) {
+    runs = runs.filter((run) => run.start_date_local.slice(0, 4) === year);
+  }
   let sumDistance = 0;
   let streak = 0;
   let pace = 0;
@@ -183,7 +194,6 @@ const YearStat = ({ runs, year, onClick }) => {
 const RunMap = ({ runs, year, viewport, setViewport }) => {
   year = year || "2020";
   const geoData = geoJsonForRuns(runs, year);
-  const startPoint = geoData.features[0].geometry.coordinates[0];
 
   const [lastWidth, setLastWidth] = useState(0);
 
@@ -230,6 +240,10 @@ const RunMapWithViewport = (props) => (
 );
 
 const RunTable = ({ runs, year, locateActivity }) => {
+  if (!yearsArr.includes(year)) {
+    // When total show 2020
+    year = "2020"
+  } 
   runs = runs.filter((run) => run.start_date_local.slice(0, 4) === year);
   runs = runs.sort((a, b) => {
     return new Date(b.start_date_local) - new Date(a.start_date_local);
@@ -306,8 +320,8 @@ const pathForRun = (run) => {
 };
 
 const geoJsonForRuns = (runs, year) => {
-  if (runs.length > 1) {
-    runs = runs.filter((run) => run.start_date_local.slice(0, 4) === year);
+  if (runs.length > 1 && yearsArr.includes(year)) {
+      runs = runs.filter((run) => run.start_date_local.slice(0, 4) === year);
   }
   return {
     type: "FeatureCollection",
@@ -341,6 +355,6 @@ const titleForRun = (run) => {
 const formatPace = (d) => {
   const pace = (1000.0 / 60.0) * (1.0 / d);
   const minutes = Math.floor(pace);
-  const seconds = (pace - minutes) * 60.0;
+  const seconds = Math.floor((pace - minutes) * 60.0);
   return `${minutes}:${seconds.toFixed(0).toString().padStart(2, "0")}`;
 };
