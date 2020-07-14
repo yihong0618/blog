@@ -1,4 +1,7 @@
 # https://yihong.run
-blog
 
-Running
+## projects
+https://yihong.run/projects
+
+## running
+https://yihong.run/running
