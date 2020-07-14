@@ -20,12 +20,28 @@ export default () => {
   const changeYear = (year) => {
     setYear(year);
     window.scroll(0, 0);
-    setActivity(activities)
+    setActivity(activities);
   };
   const [runs, setActivity] = useState(activities);
+  const [viewport, setViewport] = useState({
+    width: "100%",
+    height: 400,
+    latitude: 38.862,
+    longitude: 121.514,
+    zoom: 11.5,
+  });
   const locateActivity = (run) => {
     // TODO maybe filter some activities in the future
     setActivity([run]);
+    const geoData = geoJsonForRuns([run], run.start_date_local.slice(0, 4));
+    const startPoint = geoData.features[0].geometry.coordinates[0];
+    setViewport({
+      width: "100%",
+      height: 400,
+      latitude: startPoint[1],
+      longitude: startPoint[0],
+      zoom: 14.5,
+    });
     window.scroll(0, 0);
   };
 
@@ -40,9 +56,19 @@ export default () => {
           <YearsStat runs={activities} year={year} onClick={changeYear} />
           <div className="fl w-100 w-70-l">
             {runs.length === 1 ? (
-              <RunMapWithViewport runs={runs} year={year} />
+              <RunMapWithViewport
+                runs={runs}
+                year={year}
+                viewport={viewport}
+                setViewport={setViewport}
+              />
             ) : (
-              <RunMapWithViewport runs={activities} year={year} />
+              <RunMapWithViewport
+                runs={activities}
+                year={year}
+                viewport={viewport}
+                setViewport={setViewport}
+              />
             )}
             <RunTable
               runs={activities}
@@ -145,22 +171,18 @@ const YearStat = ({ runs, year, onClick }) => {
   );
 };
 
-const RunMap = ({ runs, year }) => {
+const RunMap = ({ runs, year, viewport, setViewport }) => {
   year = year || "2020";
-  const isSingleRun = runs.length === 1;
   const geoData = geoJsonForRuns(runs, year);
   const startPoint = geoData.features[0].geometry.coordinates[0];
-  const [viewport, setViewport] = useState({
-    width: "100%",
-    height: 400,
-    latitude: 38.862,
-    longitude: 121.514,
-    zoom: 11.5,
-  });
+  // const [viewport, setViewport] = useState({
+  //   width: "100%",
+  //   height: 400,
+  //   latitude: 38.862,
+  //   longitude: 121.514,
+  //   zoom: 11.5,
+  // });
 
-  const updateViewport = vp => {
-    setViewport(vp);
-  };
   const [lastWidth, setLastWidth] = useState(0);
 
   const dimensions = useDimensions({
@@ -171,14 +193,14 @@ const RunMap = ({ runs, year }) => {
     setTimeout(() => {
       setViewport({ width: "100%", ...viewport });
       setLastWidth(dimensions.width);
-    }, 0)
+    }, 0);
   }
-  
+
   return (
     <ReactMapGL
       {...viewport}
       mapStyle="mapbox://styles/mapbox/dark-v9?optimize=true"
-      onViewportChange={vp => updateViewport(vp)}
+      onViewportChange={setViewport}
       mapboxApiAccessToken={MAPBOX_TOKEN}
     >
       <Source id="data" type="geojson" data={geoData}>
