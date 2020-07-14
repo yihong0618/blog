@@ -1,4 +1,3 @@
-const last_sync = '2020-07-13 22:08:49';
 const strava_athlete = {
   "id": 58330365,
   "firstname": "\u4f0a",
@@ -26541,7 +26540,24 @@ const activities = [
     "average_heartrate": 151.6,
     "average_speed": 3.102,
     "streak": 60
+  },
+  {
+    "strava_id": 3758565490,
+    "athlete_id": 58330365,
+    "name": "\u6668\u95f4\u8dd1\u6b65",
+    "distance": 3522.0,
+    "moving_time": "0:18:51",
+    "elapsed_time": "0:19:04",
+    "total_elevation_gain": 38.3,
+    "type": "Run",
+    "start_date": "2020-07-13 23:46:25+00:00",
+    "start_date_local": "2020-07-14 07:46:25",
+    "location_country": null,
+    "summary_polyline": "kselFgmtdVWIkAi@MS?[XkANaBHU@W`@eBj@{CRq@r@gET@NJRBTHz@f@x@Zd@Zd@Pt@h@f@RJl@RLl@@VCPDb@Rh@BTFVAf@PPVPL`@RP@GVJPTHTNLTHVSjA@TCXDl@CZSdA@VGVCTQr@Wj@EXMVSn@CXKRs@pDQDg@SQOs@]SEg@YW?IQiBoBu@c@eAy@g@K{Ak@SASIOQ{@MmAg@a@U}@UuBu@aBg@k@MuBs@KWGYTeB@w@F]f@{Ad@{@POj@}@PO\\m@p@{@|@eBf@WPEb@[JYHYLo@JUVcABW`@aAPm@JSJkALSAYN_B@[Ns@@YHW@YHYPGPFf@ZTFPPlAl@lBpATJLR`@XnAh@b@^d@XNTPFNLRDRJNJRTNJRCHYROh@u@PIt@d@`@`@t@^b@\\v@XNN",
+    "average_heartrate": 168.2,
+    "average_speed": 3.114,
+    "streak": 61
   }
 ];
 
-export {activities, last_sync, strava_athlete};
+export {activities, strava_athlete};
