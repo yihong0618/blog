@@ -38,6 +38,7 @@ export default () => {
     ? SHENYANG_START_POINT
     : DALIAN_STRAT_POINT;
   const [runs, setActivity] = useState(activities);
+  const [title, setTitle] = useState("");
   const [viewport, setViewport] = useState({
     width: "100%",
     height: 400,
@@ -59,6 +60,7 @@ export default () => {
       longitude: onStartPoint[1],
       zoom: 11.5,
     });
+    setTitle(`${year} Running Heatmap`);
   };
 
   const locateActivity = (run) => {
@@ -77,6 +79,7 @@ export default () => {
       zoom: 14.5,
     });
     window.scroll(0, 100);
+    setTitle(titleForShow(run));
   };
 
   return (
@@ -93,6 +96,7 @@ export default () => {
               <RunMapWithViewport
                 runs={runs}
                 year={year}
+                title={title}
                 viewport={viewport}
                 setViewport={setViewport}
                 changeYear={changeYear}
@@ -101,6 +105,7 @@ export default () => {
               <RunMapWithViewport
                 runs={activities}
                 year={year}
+                title={title}
                 viewport={viewport}
                 setViewport={setViewport}
                 changeYear={changeYear}
@@ -121,6 +126,11 @@ export default () => {
 // Child components
 
 const YearsStat = ({ runs, year, onClick }) => {
+  // make sure the year click on front
+  let yearsArrayUpdate = yearsArr.slice();
+  yearsArrayUpdate = yearsArrayUpdate.filter((x) => x !== year);
+  yearsArrayUpdate.unshift(year);
+
   // for short solution need to refactor
   return (
     <div className="fl w-100 w-30-l pb5 pr5-l">
@@ -138,7 +148,7 @@ const YearsStat = ({ runs, year, onClick }) => {
         </p>
       </section>
       <hr color={"red"} />
-      {yearsArr.map((year) => (
+      {yearsArrayUpdate.map((year) => (
         <YearStat key={year} runs={runs} year={year} onClick={onClick} />
       ))}
       <YearStat key={year} runs={runs} year={"Total"} onClick={onClick} />
@@ -199,7 +209,7 @@ const YearStat = ({ runs, year, onClick }) => {
   );
 };
 
-const RunMap = ({ runs, year, viewport, setViewport, changeYear }) => {
+const RunMap = ({ runs, year, title, viewport, setViewport, changeYear }) => {
   year = year || "2020";
   const geoData = geoJsonForRuns(runs, year);
 
@@ -207,13 +217,17 @@ const RunMap = ({ runs, year, viewport, setViewport, changeYear }) => {
   const addControlHandler = (event) => {
     const map = event && event.target;
     if (map) {
-      map.addControl(new MapboxLanguage({
-        defaultLanguage: 'zh',
-      }));
-      map.setLayoutProperty('country-label-lg', 'text-field', ['get', 'name_zh']);
+      map.addControl(
+        new MapboxLanguage({
+          defaultLanguage: "zh",
+        })
+      );
+      map.setLayoutProperty("country-label-lg", "text-field", [
+        "get",
+        "name_zh",
+      ]);
     }
-  }
-  
+  };
 
   const dimensions = useDimensions({
     deferUpdateUntilIdle: true,
@@ -249,6 +263,7 @@ const RunMap = ({ runs, year, viewport, setViewport, changeYear }) => {
           }}
         />
       </Source>
+      <span className={styles.runTitle}>{title}</span>
     </ReactMapGL>
   );
 };
@@ -260,14 +275,27 @@ const RunMapWithViewport = (props) => (
 );
 
 const RunMapButtons = ({ changeYear }) => {
+  const [index, setIndex] = useState(0);
+  const handleClick = (e, year) => {
+    let elementIndex = yearsArr.indexOf(year);
+    e.target.style.color = "rgb(224,237,94)";
+
+    let elements = document.getElementsByClassName(styles.button);
+    elements[index].style.color = "white";
+    setIndex(elementIndex);
+  };
   return (
     <div>
       <ul className={styles.buttons}>
         {yearsArr.map((year) => (
           <li
             key={year}
+            style={{ color: year === "2020" ? "rgb(224,237,94)" : "white" }}
             year={year}
-            onClick={() => changeYear(year)}
+            onClick={(e) => {
+              changeYear(year);
+              handleClick(e, year);
+            }}
             className={styles.button}
           >
             {year}
@@ -322,7 +350,11 @@ const RunRow = ({ run, locateActivity }) => {
   const heartRate = run.average_heartrate;
 
   return (
-    <tr className={styles.runRow} onClick={() => locateActivity(run)}>
+    <tr
+      className={styles.runRow}
+      key={run.start_date_local}
+      onClick={() => locateActivity(run)}
+    >
       <td>{titleForRun(run)}</td>
       <td>{distance}</td>
       {pace && <td>{paceParts}</td>}
@@ -389,6 +421,19 @@ const titleForRun = (run) => {
     return run.name;
   }
   return "Run";
+};
+
+const titleForShow = (run) => {
+  const date = run.start_date_local.slice(0, 11);
+  const distance = (run.distance / 1000.0).toFixed(1);
+  let name = "Run";
+  if (run.name.slice(0, 7) === "Running") {
+    name = "run";
+  }
+  if (run.name) {
+    name = run.name;
+  }
+  return `${name} ${date} ${distance} KM`;
 };
 
 const formatPace = (d) => {
