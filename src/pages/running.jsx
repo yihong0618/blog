@@ -27,13 +27,15 @@ const yearsArr = [
   "2020",
 ].reverse();
 
-const shenyangYearsArr = ["2012", "2013", "2014"]
+const shenyangYearsArr = ["2012", "2013", "2014"];
 const DALIAN_STRAT_POINT = [38.862, 121.514];
 const SHENYANG_START_POINT = [41.78655, 123.31449];
 
 export default () => {
   const [year, setYear] = useState("2020");
-  let onStartPoint = shenyangYearsArr.includes(year) ? SHENYANG_START_POINT : DALIAN_STRAT_POINT;
+  let onStartPoint = shenyangYearsArr.includes(year)
+    ? SHENYANG_START_POINT
+    : DALIAN_STRAT_POINT;
   const [runs, setActivity] = useState(activities);
   const [viewport, setViewport] = useState({
     width: "100%",
@@ -44,25 +46,28 @@ export default () => {
   });
   const changeYear = (year) => {
     setYear(year);
-    onStartPoint = shenyangYearsArr.includes(year) ? SHENYANG_START_POINT : DALIAN_STRAT_POINT;
-    window.scroll(0, 0);
+    onStartPoint = shenyangYearsArr.includes(year)
+      ? SHENYANG_START_POINT
+      : DALIAN_STRAT_POINT;
+    window.scroll(0, 100);
     setActivity(activities);
-    setViewport(
-      {
-        width: "100%",
-        height: 400,
-        latitude: onStartPoint[0],
-        longitude: onStartPoint[1],
-        zoom: 11.5,
-      }
-    )
+    setViewport({
+      width: "100%",
+      height: 400,
+      latitude: onStartPoint[0],
+      longitude: onStartPoint[1],
+      zoom: 11.5,
+    });
   };
 
   const locateActivity = (run) => {
     // TODO maybe filter some activities in the future
     setActivity([run]);
     const geoData = geoJsonForRuns([run], run.start_date_local.slice(0, 4));
-    const startPoint = geoData.features[0].geometry.coordinates[0];
+    let startPoint = geoData.features[0].geometry.coordinates[0];
+    if (!startPoint) {
+      startPoint = DALIAN_STRAT_POINT.reverse();
+    }
     setViewport({
       width: "100%",
       height: 400,
@@ -70,7 +75,7 @@ export default () => {
       longitude: startPoint[0],
       zoom: 14.5,
     });
-    window.scroll(0, 0);
+    window.scroll(0, 100);
   };
 
   return (
@@ -116,17 +121,15 @@ const YearsStat = ({ runs, year, onClick }) => {
   // for short solution need to refactor
   return (
     <div className="fl w-100 w-30-l pb5 pr5-l">
-      <section className="pb4">
-        {/* TODO 2020作为变量 */}
-        <p>我用app记录自己跑步8年有余，下面列表展示的是{year}的数据</p>
-        <p>
+      <section className="pb4" style={{ "padding-bottom": "0rem" }} >
+        <p>我用app记录自己跑步8年有余，下面列表展示的是{year}的数据<br />
+
           现在我用NRC记录自己跑步{" "}
           <a className="dark-gray b" href="https://www.nike.com/nrc-app">
             Nike Run Club
           </a>{" "}
           希望能激励自己前行，不要停下来。这个展示也是我学习React的第一个项目，
-          希望自己有所成长。
-          <p>The best is yet to come.</p>
+          希望自己有所成长。<br />
         </p>
       </section>
       <hr color={"red"} />
@@ -242,8 +245,8 @@ const RunMapWithViewport = (props) => (
 const RunTable = ({ runs, year, locateActivity }) => {
   if (!yearsArr.includes(year)) {
     // When total show 2020
-    year = "2020"
-  } 
+    year = "2020";
+  }
   runs = runs.filter((run) => run.start_date_local.slice(0, 4) === year);
   runs = runs.sort((a, b) => {
     return new Date(b.start_date_local) - new Date(a.start_date_local);
@@ -321,7 +324,7 @@ const pathForRun = (run) => {
 
 const geoJsonForRuns = (runs, year) => {
   if (runs.length > 1 && yearsArr.includes(year)) {
-      runs = runs.filter((run) => run.start_date_local.slice(0, 4) === year);
+    runs = runs.filter((run) => run.start_date_local.slice(0, 4) === year);
   }
   return {
     type: "FeatureCollection",
