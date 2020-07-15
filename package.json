@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "author": "Yi Hong <zouzou0208@gmail.com>",
   "dependencies": {
+    "@mapbox/mapbox-gl-language": "^0.10.1",
     "@mapbox/polyline": "^1.1.1",
     "@types/react": "^16.9.36",
     "classnames": "^2.2.6",

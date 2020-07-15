@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from "react";
 import { Helmet } from "react-helmet";
 import * as mapboxPolyline from "@mapbox/polyline";
+import MapboxLanguage from "@mapbox/mapbox-gl-language";
 import ReactMapGL, { Source, Layer } from "react-map-gl";
 import { ViewportProvider, useDimensions } from "react-viewport-utils";
 
@@ -94,6 +95,7 @@ export default () => {
                 year={year}
                 viewport={viewport}
                 setViewport={setViewport}
+                changeYear={changeYear}
               />
             ) : (
               <RunMapWithViewport
@@ -101,6 +103,7 @@ export default () => {
                 year={year}
                 viewport={viewport}
                 setViewport={setViewport}
+                changeYear={changeYear}
               />
             )}
             <RunTable
@@ -121,15 +124,17 @@ const YearsStat = ({ runs, year, onClick }) => {
   // for short solution need to refactor
   return (
     <div className="fl w-100 w-30-l pb5 pr5-l">
-      <section className="pb4" style={{ "padding-bottom": "0rem" }} >
-        <p>我用app记录自己跑步8年有余，下面列表展示的是{year}的数据<br />
-
+      <section className="pb4" style={{ paddingBottom: "0rem" }}>
+        <p>
+          我用app记录自己跑步8年有余，下面列表展示的是{year}的数据
+          <br />
           现在我用NRC记录自己跑步{" "}
           <a className="dark-gray b" href="https://www.nike.com/nrc-app">
             Nike Run Club
           </a>{" "}
           希望能激励自己前行，不要停下来。这个展示也是我学习React的第一个项目，
-          希望自己有所成长。<br />
+          希望自己有所成长。
+          <br />
         </p>
       </section>
       <hr color={"red"} />
@@ -194,11 +199,21 @@ const YearStat = ({ runs, year, onClick }) => {
   );
 };
 
-const RunMap = ({ runs, year, viewport, setViewport }) => {
+const RunMap = ({ runs, year, viewport, setViewport, changeYear }) => {
   year = year || "2020";
   const geoData = geoJsonForRuns(runs, year);
 
   const [lastWidth, setLastWidth] = useState(0);
+  const addControlHandler = (event) => {
+    const map = event && event.target;
+    if (map) {
+      map.addControl(new MapboxLanguage({
+        defaultLanguage: 'zh',
+      }));
+      map.setLayoutProperty('country-label-lg', 'text-field', ['get', 'name_zh']);
+    }
+  }
+  
 
   const dimensions = useDimensions({
     deferUpdateUntilIdle: true,
@@ -214,10 +229,12 @@ const RunMap = ({ runs, year, viewport, setViewport }) => {
   return (
     <ReactMapGL
       {...viewport}
-      mapStyle="mapbox://styles/mapbox/dark-v9?optimize=true"
+      mapStyle="mapbox://styles/mapbox/dark-v9"
       onViewportChange={setViewport}
+      onLoad={addControlHandler}
       mapboxApiAccessToken={MAPBOX_TOKEN}
     >
+      <RunMapButtons changeYear={changeYear} />
       <Source id="data" type="geojson" data={geoData}>
         <Layer
           id="runs"
@@ -241,6 +258,25 @@ const RunMapWithViewport = (props) => (
     <RunMap {...props} />
   </ViewportProvider>
 );
+
+const RunMapButtons = ({ changeYear }) => {
+  return (
+    <div>
+      <ul className={styles.buttons}>
+        {yearsArr.map((year) => (
+          <li
+            key={year}
+            year={year}
+            onClick={() => changeYear(year)}
+            className={styles.button}
+          >
+            {year}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
 const RunTable = ({ runs, year, locateActivity }) => {
   if (!yearsArr.includes(year)) {

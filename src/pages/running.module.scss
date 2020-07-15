@@ -62,3 +62,22 @@ $dark: rgb(26, 26, 26);
 .runDate {
   color: $light;
 }
+
+.buttons {
+  width: 90%;
+  margin: 0 auto;
+}
+
+.button {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  width: 11%;
+  padding: 10px;
+  margin-top: 1px;
+  font-size: 10px;
+  text-align: center;
+  color: write;
+  font-family: sans-serif;
+  font-weight: bold;
+}
