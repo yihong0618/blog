@@ -51,7 +51,7 @@ export default () => {
     onStartPoint = shenyangYearsArr.includes(year)
       ? SHENYANG_START_POINT
       : DALIAN_STRAT_POINT;
-    window.scroll(0, 100);
+    scrollToMap();
     setActivity(activities);
     setViewport({
       width: "100%",
@@ -66,10 +66,13 @@ export default () => {
   const locateActivity = (run) => {
     // TODO maybe filter some activities in the future
     setActivity([run]);
+    let startPoint;
     const geoData = geoJsonForRuns([run], run.start_date_local.slice(0, 4));
-    let startPoint = geoData.features[0].geometry.coordinates[0];
-    if (!startPoint) {
+    let coordinates = geoData.features[0].geometry.coordinates;
+    if (coordinates.length === 0) {
       startPoint = DALIAN_STRAT_POINT.reverse();
+    } else {
+      startPoint = coordinates[Math.floor(coordinates.length / 2)];
     }
     setViewport({
       width: "100%",
@@ -78,7 +81,7 @@ export default () => {
       longitude: startPoint[0],
       zoom: 14.5,
     });
-    window.scroll(0, 100);
+    scrollToMap();
     setTitle(titleForShow(run));
   };
 
@@ -136,7 +139,7 @@ const YearsStat = ({ runs, year, onClick }) => {
     <div className="fl w-100 w-30-l pb5 pr5-l">
       <section className="pb4" style={{ paddingBottom: "0rem" }}>
         <p>
-          我用app记录自己跑步8年有余，下面列表展示的是{year}的数据
+          我用 App 记录自己跑步8年有余，下面列表展示的是{year}的数据
           <br />
           现在我用NRC记录自己跑步{" "}
           <a className="dark-gray b" href="https://www.nike.com/nrc-app">
@@ -307,6 +310,7 @@ const RunMapButtons = ({ changeYear }) => {
 };
 
 const RunTable = ({ runs, year, locateActivity }) => {
+  const [runIndex, setRunIndex] = useState(-1);
   if (!yearsArr.includes(year)) {
     // When total show 2020
     year = "2020";
@@ -330,9 +334,12 @@ const RunTable = ({ runs, year, locateActivity }) => {
         <tbody>
           {runs.map((run) => (
             <RunRow
+              runs={runs}
               run={run}
               key={run.strava_id}
               locateActivity={locateActivity}
+              runIndex={runIndex}
+              setRunIndex={setRunIndex}
             />
           ))}
         </tbody>
@@ -341,7 +348,7 @@ const RunTable = ({ runs, year, locateActivity }) => {
   );
 };
 
-const RunRow = ({ run, locateActivity }) => {
+const RunRow = ({ runs, run, locateActivity, runIndex, setRunIndex }) => {
   const distance = (run.distance / 1000.0).toFixed(1);
   const pace = run.average_speed;
 
@@ -349,11 +356,26 @@ const RunRow = ({ run, locateActivity }) => {
 
   const heartRate = run.average_heartrate;
 
+  // change click color
+  const handleClick = (e, runs, run) => {
+    let elementIndex = runs.indexOf(run);
+    e.target.parentElement.style.color = "red";
+
+    let elements = document.getElementsByClassName(styles.runRow);
+    if (runIndex !== -1) {
+      elements[runIndex].style.color = "rgb(224,237,94)";
+    }
+    setRunIndex(elementIndex);
+  };
+
   return (
     <tr
       className={styles.runRow}
       key={run.start_date_local}
-      onClick={() => locateActivity(run)}
+      onClick={(e) => {
+        handleClick(e, runs, run);
+        locateActivity(run);
+      }}
     >
       <td>{titleForRun(run)}</td>
       <td>{distance}</td>
@@ -441,4 +463,11 @@ const formatPace = (d) => {
   const minutes = Math.floor(pace);
   const seconds = Math.floor((pace - minutes) * 60.0);
   return `${minutes}:${seconds.toFixed(0).toString().padStart(2, "0")}`;
+};
+
+// for scroll to the map
+const scrollToMap = () => {
+  let el = document.querySelector(".fl.w-100.w-70-l");
+  const rect = el.getBoundingClientRect();
+  window.scroll(rect.left + window.scrollX, rect.top + window.scrollY);
 };

@@ -7,19 +7,13 @@ $dark: rgb(26, 26, 26);
 .body {
   background-color: $dark;
   color: $nike;
-  a,
   p,
   h1,
+  h3,
   h4,
   li {
     color: $nike;
   }
-}
-
-.hr {
-  size: 1;
-  border-style: dotted;
-  width: inherit;
 }
 
 .runTable {
