@@ -14,7 +14,7 @@ SQL_FILE = "scripts/data.db"
 
 def run(client_id, client_secret, refresh_token):
     generator = Generator(SQL_FILE, client_id, client_secret, refresh_token)
-    generator.sync(True)
+    generator.sync(False)
 
     athlete, activities_list = generator.load()
     with open(JSON_FILE, "w") as f:

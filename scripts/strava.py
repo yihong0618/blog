@@ -206,9 +206,17 @@ if __name__ == "__main__":
     parser.add_argument("client_secret", help="strava client secret")
     parser.add_argument("refresh_token", help="strava refresh token")
     options = parser.parse_args()
-    client = make_client(
-        options.client_id, options.client_secret, options.refresh_token
-    )
+    try:
+        client = make_client(
+            options.client_id, options.client_secret, options.refresh_token
+        )
+    except:
+        print("try again login strava")
+        time.sleep(10)
+        client = make_client(
+            options.client_id, options.client_secret, options.refresh_token
+        )
+
     last_time = get_last_time(client)
     files = get_to_generate_files(last_time)
     make_new_gpxs(files)
