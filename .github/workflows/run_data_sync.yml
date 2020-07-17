@@ -61,7 +61,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "Add new runs"
-          files: data/activities/ src/static/ scripts/
+          files: data/activities/ src/static/ scripts/data.db
           rebase: 'true'
           name: yihong0618 
           email: zouzou0208@gmail.com
