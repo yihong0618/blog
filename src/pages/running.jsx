@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import * as mapboxPolyline from "@mapbox/polyline";
 import MapboxLanguage from "@mapbox/mapbox-gl-language";
@@ -7,6 +7,7 @@ import { ViewportProvider, useDimensions } from "react-viewport-utils";
 
 import Layout from "../components/layout";
 import { activities } from "../static/activities";
+import { chinaGeojson } from "../static/china";
 
 import "mapbox-gl/dist/mapbox-gl.css";
 import styles from "./running.module.scss";
@@ -14,24 +15,70 @@ import styles from "./running.module.scss";
 const MAPBOX_TOKEN =
   "pk.eyJ1IjoieWlob25nMDYxOCIsImEiOiJja2J3M28xbG4wYzl0MzJxZm0ya2Fua2p2In0.PNKfkeQwYuyGOTT_x9BJ4Q";
 
-// Page
-
-const yearsArr = [
-  "2012",
-  "2013",
-  "2014",
-  "2015",
-  "2016",
-  "2017",
-  "2018",
-  "2019",
-  "2020",
-].reverse();
-
+// const
+const municipalityCitiesArr = ["北京市", "上海市", "天津市", "重庆市" , "香港特别行政区", "澳门特别行政区"]
 const shenyangYearsArr = ["2012", "2013", "2014"];
 const DALIAN_STRAT_POINT = [38.862, 121.514];
 const SHENYANG_START_POINT = [41.78655, 123.31449];
+let provinces = [];
+let citys = {};
+let yearsArr = [];
 
+const locationForRun = (run) => {
+  const location = run.location_country
+  let [city, province, country] = ["", "", ""];
+  if (location) {
+    const cityMatch = location.match(/[\u4e00-\u9fa5]*市/);
+    const provinceMatch = location.match(/[\u4e00-\u9fa5]*省/);
+    if (cityMatch) {
+      city = cityMatch[0];
+    };
+    if (provinceMatch) {
+      province = provinceMatch[0];
+    };
+    const l = location.split(",")
+    const countryMatch = l[l.length - 1].match(/[\u4e00-\u9fa5].*[\u4e00-\u9fa5]/)
+    if (countryMatch) {
+      country = countryMatch[0];
+    }
+  }
+  if (municipalityCitiesArr.includes(city)) {
+    province = city
+  }
+
+  return { country, province, city }
+}
+
+
+// generate base attr
+const generateBase = ((activities) => {
+  let locationsList = [];
+  activities.forEach(
+    (activite) => {
+      let location = locationForRun(activite);
+      locationsList.push(location);
+      let city = location.city;
+      citys[city] = (citys[city] === undefined ? 1 : citys[city] + 1)
+      let province = location.province;
+      provinces.push(province);
+      let year = activite.start_date_local.slice(0, 4);
+      yearsArr.push(year)
+    }
+  )
+  yearsArr = [...new Set(yearsArr)].sort().reverse();
+  provinces = [...new Set(provinces)];
+  // let jsonObject = locationsList.map(JSON.stringify); 
+
+  // let uniqueSet = new Set(jsonObject); 
+  // let uniqueArray = Array.from(uniqueSet).map(JSON.parse); 
+
+  // console.log(uniqueArray);
+  return 1
+})(activities);
+
+console.log(provinces)
+
+// Page
 export default () => {
   const [year, setYear] = useState("2020");
   let onStartPoint = shenyangYearsArr.includes(year)
@@ -53,15 +100,20 @@ export default () => {
       : DALIAN_STRAT_POINT;
     scrollToMap();
     setActivity(activities);
-    setViewport({
-      width: "100%",
-      height: 400,
-      latitude: onStartPoint[0],
-      longitude: onStartPoint[1],
-      zoom: 11.5,
-    });
+    if (viewport.zoom > 3) {
+      setViewport({
+        width: "100%",
+        height: 400,
+        latitude: onStartPoint[0],
+        longitude: onStartPoint[1],
+        zoom: 11.5,
+      });
+    }
     setTitle(`${year} Running Heatmap`);
   };
+  if (viewport.zoom < 3) {
+    console.log(44444)
+  }
 
   const locateActivity = (run) => {
     // TODO maybe filter some activities in the future
@@ -105,15 +157,15 @@ export default () => {
                 changeYear={changeYear}
               />
             ) : (
-              <RunMapWithViewport
-                runs={activities}
-                year={year}
-                title={title}
-                viewport={viewport}
-                setViewport={setViewport}
-                changeYear={changeYear}
-              />
-            )}
+                <RunMapWithViewport
+                  runs={activities}
+                  year={year}
+                  title={title}
+                  viewport={viewport}
+                  setViewport={setViewport}
+                  changeYear={changeYear}
+                />
+              )}
             <RunTable
               runs={activities}
               year={year}
@@ -154,7 +206,7 @@ const YearsStat = ({ runs, year, onClick }) => {
       {yearsArrayUpdate.map((year) => (
         <YearStat key={year} runs={runs} year={year} onClick={onClick} />
       ))}
-      <YearStat key={year} runs={runs} year={"Total"} onClick={onClick} />
+      <YearStat key={"Total"} runs={runs} year={"Total"} onClick={onClick} />
     </div>
   );
 };
@@ -212,9 +264,60 @@ const YearStat = ({ runs, year, onClick }) => {
   );
 };
 
+const locationStat = ({ runs, location }) => {
+
+  let sumDistance = 0;
+  let streak = 0;
+  let pace = 0;
+  let paceNullCount = 0;
+  let heartRate = 0;
+  let heartRateNullCount = 0;
+  runs.forEach((run) => {
+    sumDistance += run.distance || 0;
+    if (run.average_speed) {
+      pace += run.average_speed;
+    } else {
+      paceNullCount++;
+    }
+    if (run.average_heartrate) {
+      heartRate += run.average_heartrate;
+    } else {
+      heartRateNullCount++;
+    }
+    if (run.streak) {
+      streak = Math.max(streak, run.streak);
+    }
+  });
+  sumDistance = (sumDistance / 1000.0).toFixed(1);
+  const avgPace = formatPace(pace / (runs.length - paceNullCount));
+  const hasHeartRate = !(heartRate === 0);
+  const avgHeartRate = (heartRate / (runs.length - heartRateNullCount)).toFixed(
+    0
+  );
+  return (
+    <div style={{ cursor: "pointer" }} onClick={() => onClick(year)}>
+      <section>
+        <Stat value={year} description=" 跑步旅程" />
+        <Stat value={runs.length} description=" Runs" />
+        <Stat value={sumDistance} description=" KM" />
+        <Stat value={avgPace} description=" Avg Pace" />
+        <Stat
+          value={`${streak} day`}
+          description=" Streak"
+          className="mb0 pb0"
+        />
+        {hasHeartRate && (
+          <Stat value={avgHeartRate} description=" Avg Heart Rate" />
+        )}
+      </section>
+      <hr color={"red"} />
+    </div>
+  );
+};
+
 const RunMap = ({ runs, year, title, viewport, setViewport, changeYear }) => {
   year = year || "2020";
-  const geoData = geoJsonForRuns(runs, year);
+  let geoData = geoJsonForRuns(runs, year);
 
   const [lastWidth, setLastWidth] = useState(0);
   const addControlHandler = (event) => {
@@ -231,6 +334,8 @@ const RunMap = ({ runs, year, title, viewport, setViewport, changeYear }) => {
       ]);
     }
   };
+  let filterProvinces = provinces.slice()
+  filterProvinces.unshift("in", "name")
 
   const dimensions = useDimensions({
     deferUpdateUntilIdle: true,
@@ -241,6 +346,10 @@ const RunMap = ({ runs, year, title, viewport, setViewport, changeYear }) => {
       setViewport({ width: "100%", ...viewport });
       setLastWidth(dimensions.width);
     }, 0);
+  }
+  let isBigMap = (viewport.zoom <= 3)
+  if (isBigMap) {
+    geoData = geoJsonForMap()
   }
 
   return (
@@ -253,17 +362,39 @@ const RunMap = ({ runs, year, title, viewport, setViewport, changeYear }) => {
     >
       <RunMapButtons changeYear={changeYear} />
       <Source id="data" type="geojson" data={geoData}>
-        <Layer
-          id="runs"
+
+        {isBigMap ? <Layer
+          id="runs2"
           type="line"
           paint={{
             "line-color": "rgb(224,237,94)",
-            "line-width": 2,
+            "line-width": 1,
           }}
           layout={{
             "line-join": "round",
             "line-cap": "round",
           }}
+        /> :
+          <Layer
+            id="runs2"
+            type="line"
+            paint={{
+              "line-color": "rgb(224,237,94)",
+              "line-width": 2,
+            }}
+            layout={{
+              "line-join": "round",
+              "line-cap": "round",
+            }}
+          />
+        }
+        <Layer
+          id="prvince"
+          type="fill"
+          paint={{
+            "fill-color": "#47b8e0",
+          }}
+          filter={filterProvinces}
         />
       </Source>
       <span className={styles.runTitle}>{title}</span>
@@ -292,7 +423,7 @@ const RunMapButtons = ({ changeYear }) => {
       <ul className={styles.buttons}>
         {yearsArr.map((year) => (
           <li
-            key={year}
+            key={year + 'button'}
             style={{ color: year === "2020" ? "rgb(224,237,94)" : "white" }}
             year={year}
             onClick={(e) => {
@@ -351,6 +482,7 @@ const RunTable = ({ runs, year, locateActivity }) => {
 const RunRow = ({ runs, run, locateActivity, runIndex, setRunIndex }) => {
   const distance = (run.distance / 1000.0).toFixed(1);
   const pace = run.average_speed;
+  const { country, province, city } = locationForRun(run)
 
   const paceParts = pace ? formatPace(pace) : null;
 
@@ -434,6 +566,11 @@ const geoJsonForRuns = (runs, year) => {
     }),
   };
 };
+
+const geoJsonForMap = () => {
+  return chinaGeojson
+};
+
 
 const titleForRun = (run) => {
   if (run.name.slice(0, 7) === "Running") {

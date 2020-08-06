@@ -1,7 +1,9 @@
+import time
 import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
 from geopy import distance as geopy_distance  # type: ignore
+from geopy.geocoders import Nominatim
 import polyline  # type: ignore
 from sqlalchemy import (
     create_engine,
@@ -33,6 +35,9 @@ class Athlete(Base):
 
     def to_dict(self) -> Dict:
         return {"id": self.id, "firstname": self.firstname, "lastname": self.lastname}
+
+# reverse the location (lan, lon) -> location detail
+g = Nominatim(user_agent="yihong0618")
 
 
 def is_point_on_track(
@@ -140,6 +145,18 @@ def update_or_create_activity(session: Session, athlete: Athlete, strava_activit
     created = False
     activity: Optional[Activity] = session.query(Activity).filter_by(strava_id=strava_activity.id).first()
     if not activity:
+        start_point = strava_activity.start_latlng
+        location_country = strava_activity.location_country
+        if start_point:
+            try:
+                location_country = str(g.reverse(f"{start_point.lat}, {start_point.lon}"))
+            # limit (only for the first time)
+            except:
+                print("+++++++limit+++++++")
+                time.sleep(60)
+                location_country = str(g.reverse(f"{start_point.lat}, {start_point.lon}"))
+                
+            
         activity = Activity(
             strava_id=strava_activity.id,
             athlete=athlete,
@@ -151,7 +168,7 @@ def update_or_create_activity(session: Session, athlete: Athlete, strava_activit
             type=strava_activity.type,
             start_date=strava_activity.start_date,
             start_date_local=strava_activity.start_date_local,
-            location_country=strava_activity.location_country,
+            location_country=location_country,
             average_heartrate=strava_activity.average_heartrate,
             average_speed=float(strava_activity.average_speed),
         )
