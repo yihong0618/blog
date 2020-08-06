@@ -14,6 +14,7 @@ SQL_FILE = "scripts/data.db"
 
 def run(client_id, client_secret, refresh_token):
     generator = Generator(SQL_FILE, client_id, client_secret, refresh_token)
+    # if you want to update data change False to True
     generator.sync(False)
 
     athlete, activities_list = generator.load()
