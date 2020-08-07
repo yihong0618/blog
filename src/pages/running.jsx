@@ -1,93 +1,91 @@
-import React, { Fragment, useState, useEffect } from "react";
-import { Helmet } from "react-helmet";
-import * as mapboxPolyline from "@mapbox/polyline";
-import MapboxLanguage from "@mapbox/mapbox-gl-language";
-import ReactMapGL, { Source, Layer } from "react-map-gl";
-import { ViewportProvider, useDimensions } from "react-viewport-utils";
+import React, { useState, Fragment } from 'react';
+import { Helmet } from 'react-helmet';
+import * as mapboxPolyline from '@mapbox/polyline';
+import MapboxLanguage from '@mapbox/mapbox-gl-language';
+import ReactMapGL, { Source, Layer } from 'react-map-gl';
+import { ViewportProvider, useDimensions } from 'react-viewport-utils';
 
-import Layout from "../components/layout";
-import { activities } from "../static/activities";
-import { chinaGeojson } from "../static/china";
+import Layout from '../components/layout';
+import { activities } from '../static/activities';
+import { chinaGeojson } from '../static/run_countries';
 
-import "mapbox-gl/dist/mapbox-gl.css";
-import styles from "./running.module.scss";
+import 'mapbox-gl/dist/mapbox-gl.css';
+import styles from './running.module.scss';
 
-const MAPBOX_TOKEN =
-  "pk.eyJ1IjoieWlob25nMDYxOCIsImEiOiJja2J3M28xbG4wYzl0MzJxZm0ya2Fua2p2In0.PNKfkeQwYuyGOTT_x9BJ4Q";
+const MAPBOX_TOKEN = 'pk.eyJ1IjoieWlob25nMDYxOCIsImEiOiJja2J3M28xbG4wYzl0MzJxZm0ya2Fua2p2In0.PNKfkeQwYuyGOTT_x9BJ4Q';
 
 // const
-const municipalityCitiesArr = ["北京市", "上海市", "天津市", "重庆市" , "香港特别行政区", "澳门特别行政区"]
-const shenyangYearsArr = ["2012", "2013", "2014"];
+const municipalityCitiesArr = ['北京市', '上海市', '天津市', '重庆市', '香港特别行政区', '澳门特别行政区'];
+const shenyangYearsArr = ['2012', '2013', '2014'];
 const DALIAN_STRAT_POINT = [38.862, 121.514];
 const SHENYANG_START_POINT = [41.78655, 123.31449];
+const cities = {};
 let provinces = [];
-let citys = {};
+let countries = [];
 let yearsArr = [];
 
 const locationForRun = (run) => {
-  const location = run.location_country
-  let [city, province, country] = ["", "", ""];
+  const location = run.location_country;
+  let [city, province, country] = ['', '', ''];
   if (location) {
     const cityMatch = location.match(/[\u4e00-\u9fa5]*市/);
     const provinceMatch = location.match(/[\u4e00-\u9fa5]*省/);
     if (cityMatch) {
-      city = cityMatch[0];
-    };
+      [city] = cityMatch;
+    }
     if (provinceMatch) {
-      province = provinceMatch[0];
-    };
-    const l = location.split(",")
-    const countryMatch = l[l.length - 1].match(/[\u4e00-\u9fa5].*[\u4e00-\u9fa5]/)
+      [province] = provinceMatch;
+    }
+    const l = location.split(',');
+    const countryMatch = l[l.length - 1].match(/[\u4e00-\u9fa5].*[\u4e00-\u9fa5]/);
     if (countryMatch) {
-      country = countryMatch[0];
+      [country] = countryMatch;
     }
   }
   if (municipalityCitiesArr.includes(city)) {
-    province = city
+    province = city;
   }
 
-  return { country, province, city }
-}
-
+  return { country, province, city };
+};
 
 // generate base attr
-const generateBase = ((activities) => {
-  let locationsList = [];
-  activities.forEach(
-    (activite) => {
-      let location = locationForRun(activite);
+((runs) => {
+  const locationsList = [];
+  runs.forEach(
+    (run) => {
+      const location = locationForRun(run);
       locationsList.push(location);
-      let city = location.city;
-      citys[city] = (citys[city] === undefined ? 1 : citys[city] + 1)
-      let province = location.province;
-      provinces.push(province);
-      let year = activite.start_date_local.slice(0, 4);
-      yearsArr.push(year)
-    }
-  )
+      const { city, province, country } = location;
+      // drop only one char city
+      if (city.length > 1) {
+        cities[city] = (cities[city] === undefined ? run.distance : cities[city] + run.distance);
+      }
+      if (province) {
+        provinces.push(province);
+      }
+      if (country) {
+        countries.push(country);
+      }
+      const y = run.start_date_local.slice(0, 4);
+      yearsArr.push(y);
+    },
+  );
   yearsArr = [...new Set(yearsArr)].sort().reverse();
   provinces = [...new Set(provinces)];
-  // let jsonObject = locationsList.map(JSON.stringify); 
-
-  // let uniqueSet = new Set(jsonObject); 
-  // let uniqueArray = Array.from(uniqueSet).map(JSON.parse); 
-
-  // console.log(uniqueArray);
-  return 1
+  countries = [...new Set(countries)];
 })(activities);
-
-console.log(provinces)
 
 // Page
 export default () => {
-  const [year, setYear] = useState("2020");
+  const [year, setYear] = useState('2020');
   let onStartPoint = shenyangYearsArr.includes(year)
     ? SHENYANG_START_POINT
     : DALIAN_STRAT_POINT;
   const [runs, setActivity] = useState(activities);
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState('');
   const [viewport, setViewport] = useState({
-    width: "100%",
+    width: '100%',
     height: 400,
     latitude: onStartPoint[0],
     longitude: onStartPoint[1],
@@ -102,7 +100,7 @@ export default () => {
     setActivity(activities);
     if (viewport.zoom > 3) {
       setViewport({
-        width: "100%",
+        width: '100%',
         height: 400,
         latitude: onStartPoint[0],
         longitude: onStartPoint[1],
@@ -111,23 +109,20 @@ export default () => {
     }
     setTitle(`${year} Running Heatmap`);
   };
-  if (viewport.zoom < 3) {
-    console.log(44444)
-  }
 
   const locateActivity = (run) => {
     // TODO maybe filter some activities in the future
     setActivity([run]);
     let startPoint;
     const geoData = geoJsonForRuns([run], run.start_date_local.slice(0, 4));
-    let coordinates = geoData.features[0].geometry.coordinates;
+    const { coordinates } = geoData.features[0].geometry;
     if (coordinates.length === 0) {
       startPoint = DALIAN_STRAT_POINT.reverse();
     } else {
       startPoint = coordinates[Math.floor(coordinates.length / 2)];
     }
     setViewport({
-      width: "100%",
+      width: '100%',
       height: 400,
       latitude: startPoint[1],
       longitude: startPoint[0],
@@ -138,14 +133,14 @@ export default () => {
   };
 
   return (
-    <Fragment>
+    <>
       <Helmet bodyAttributes={{ class: styles.body }} />
       <Layout>
         <div className="mb5">
           <div className="w-100">
             <h1 className="f1 fw9 i">Running</h1>
           </div>
-          <YearsStat runs={activities} year={year} onClick={changeYear} />
+          {viewport.zoom <= 3 ? <LocationStat runs={activities} location="a" onClick={changeYear} /> : <YearsStat runs={activities} year={year} onClick={changeYear} />}
           <div className="fl w-100 w-70-l">
             {runs.length === 1 ? (
               <RunMapWithViewport
@@ -157,15 +152,15 @@ export default () => {
                 changeYear={changeYear}
               />
             ) : (
-                <RunMapWithViewport
-                  runs={activities}
-                  year={year}
-                  title={title}
-                  viewport={viewport}
-                  setViewport={setViewport}
-                  changeYear={changeYear}
-                />
-              )}
+              <RunMapWithViewport
+                runs={activities}
+                year={year}
+                title={title}
+                viewport={viewport}
+                setViewport={setViewport}
+                changeYear={changeYear}
+              />
+            )}
             <RunTable
               runs={activities}
               year={year}
@@ -174,7 +169,7 @@ export default () => {
           </div>
         </div>
       </Layout>
-    </Fragment>
+    </>
   );
 };
 
@@ -189,27 +184,50 @@ const YearsStat = ({ runs, year, onClick }) => {
   // for short solution need to refactor
   return (
     <div className="fl w-100 w-30-l pb5 pr5-l">
-      <section className="pb4" style={{ paddingBottom: "0rem" }}>
+      <section className="pb4" style={{ paddingBottom: '0rem' }}>
         <p>
-          我用 App 记录自己跑步8年有余，下面列表展示的是{year}的数据
+          我用 App 记录自己跑步8年有余，下面列表展示的是
+          {year}
+          的数据
           <br />
-          现在我用NRC记录自己跑步{" "}
+          现在我用NRC记录自己跑步
+          {' '}
           <a className="dark-gray b" href="https://www.nike.com/nrc-app">
             Nike Run Club
-          </a>{" "}
+          </a>
+          {' '}
           希望能激励自己前行，不要停下来。这个展示也是我学习React的第一个项目，
           希望自己有所成长。
           <br />
         </p>
       </section>
-      <hr color={"red"} />
+      <hr color="red" />
       {yearsArrayUpdate.map((year) => (
         <YearStat key={year} runs={runs} year={year} onClick={onClick} />
       ))}
-      <YearStat key={"Total"} runs={runs} year={"Total"} onClick={onClick} />
+      <YearStat key="Total" runs={runs} year="Total" onClick={onClick} />
     </div>
   );
 };
+
+const LocationStat = ({ runs, location, onClick }) => (
+  <div className="fl w-100 w-30-l pb5 pr5-l">
+    <section className="pb4" style={{ paddingBottom: '0rem' }}>
+      <p>
+        我跑过了一些地方，希望随着时间的推移，地图点亮的地方越来越多.
+        <br />
+        不要停下来，不要停下奔跑的脚步.
+        <br />
+        <br />
+        Yesterday you said tomorrow.
+      </p>
+    </section>
+    <hr color="red" />
+    <LocationSummary key="locationsSummary" />
+    <CitiesStat />
+    <YearStat key="Total" runs={runs} year="Total" onClick={onClick} />
+  </div>
+);
 
 const YearStat = ({ runs, year, onClick }) => {
   if (yearsArr.includes(year)) {
@@ -241,10 +259,10 @@ const YearStat = ({ runs, year, onClick }) => {
   const avgPace = formatPace(pace / (runs.length - paceNullCount));
   const hasHeartRate = !(heartRate === 0);
   const avgHeartRate = (heartRate / (runs.length - heartRateNullCount)).toFixed(
-    0
+    0,
   );
   return (
-    <div style={{ cursor: "pointer" }} onClick={() => onClick(year)}>
+    <div style={{ cursor: 'pointer' }} onClick={() => onClick(year)}>
       <section>
         <Stat value={year} description=" 跑步旅程" />
         <Stat value={runs.length} description=" Runs" />
@@ -259,64 +277,42 @@ const YearStat = ({ runs, year, onClick }) => {
           <Stat value={avgHeartRate} description=" Avg Heart Rate" />
         )}
       </section>
-      <hr color={"red"} />
+      <hr color="red" />
     </div>
   );
 };
 
-const locationStat = ({ runs, location }) => {
+const LocationSummary = () => (
+  <div style={{ cursor: 'pointer' }}>
+    <section>
+      <Stat value={`${yearsArr.length}`} description=" 年里我跑过" />
+      <Stat value={countries.length} description=" 个国家" />
+      <Stat value={provinces.length} description=" 个省份" />
+      <Stat value={Object.keys(cities).length} description=" 个城市" />
+    </section>
+    <hr color="red" />
+  </div>
+);
 
-  let sumDistance = 0;
-  let streak = 0;
-  let pace = 0;
-  let paceNullCount = 0;
-  let heartRate = 0;
-  let heartRateNullCount = 0;
-  runs.forEach((run) => {
-    sumDistance += run.distance || 0;
-    if (run.average_speed) {
-      pace += run.average_speed;
-    } else {
-      paceNullCount++;
-    }
-    if (run.average_heartrate) {
-      heartRate += run.average_heartrate;
-    } else {
-      heartRateNullCount++;
-    }
-    if (run.streak) {
-      streak = Math.max(streak, run.streak);
-    }
-  });
-  sumDistance = (sumDistance / 1000.0).toFixed(1);
-  const avgPace = formatPace(pace / (runs.length - paceNullCount));
-  const hasHeartRate = !(heartRate === 0);
-  const avgHeartRate = (heartRate / (runs.length - heartRateNullCount)).toFixed(
-    0
-  );
+const CitiesStat = () => {
+  const citiesArr = Object.entries(cities);
+  citiesArr.sort((a, b) => b[1] - a[1]);
   return (
-    <div style={{ cursor: "pointer" }} onClick={() => onClick(year)}>
+    <div style={{ cursor: 'pointer' }}>
       <section>
-        <Stat value={year} description=" 跑步旅程" />
-        <Stat value={runs.length} description=" Runs" />
-        <Stat value={sumDistance} description=" KM" />
-        <Stat value={avgPace} description=" Avg Pace" />
-        <Stat
-          value={`${streak} day`}
-          description=" Streak"
-          className="mb0 pb0"
-        />
-        {hasHeartRate && (
-          <Stat value={avgHeartRate} description=" Avg Heart Rate" />
-        )}
+        {citiesArr.map(([city, distance]) => (
+          <Stat value={city} description={` ${(distance / 1000).toFixed(0)} KM`} citySize={3} />
+        ))}
       </section>
-      <hr color={"red"} />
+      <hr color="red" />
     </div>
   );
 };
 
-const RunMap = ({ runs, year, title, viewport, setViewport, changeYear }) => {
-  year = year || "2020";
+const RunMap = ({
+  runs, year, title, viewport, setViewport, changeYear,
+}) => {
+  year = year || '2020';
   let geoData = geoJsonForRuns(runs, year);
 
   const [lastWidth, setLastWidth] = useState(0);
@@ -325,17 +321,17 @@ const RunMap = ({ runs, year, title, viewport, setViewport, changeYear }) => {
     if (map) {
       map.addControl(
         new MapboxLanguage({
-          defaultLanguage: "zh",
-        })
+          defaultLanguage: 'zh',
+        }),
       );
-      map.setLayoutProperty("country-label-lg", "text-field", [
-        "get",
-        "name_zh",
+      map.setLayoutProperty('country-label-lg', 'text-field', [
+        'get',
+        'name_zh',
       ]);
     }
   };
-  let filterProvinces = provinces.slice()
-  filterProvinces.unshift("in", "name")
+  const filterProvinces = provinces.slice();
+  filterProvinces.unshift('in', 'name');
 
   const dimensions = useDimensions({
     deferUpdateUntilIdle: true,
@@ -343,13 +339,13 @@ const RunMap = ({ runs, year, title, viewport, setViewport, changeYear }) => {
   });
   if (lastWidth !== dimensions.width) {
     setTimeout(() => {
-      setViewport({ width: "100%", ...viewport });
+      setViewport({ width: '100%', ...viewport });
       setLastWidth(dimensions.width);
     }, 0);
   }
-  let isBigMap = (viewport.zoom <= 3)
+  const isBigMap = (viewport.zoom <= 3);
   if (isBigMap) {
-    geoData = geoJsonForMap()
+    geoData = geoJsonForMap();
   }
 
   return (
@@ -363,36 +359,23 @@ const RunMap = ({ runs, year, title, viewport, setViewport, changeYear }) => {
       <RunMapButtons changeYear={changeYear} />
       <Source id="data" type="geojson" data={geoData}>
 
-        {isBigMap ? <Layer
+        <Layer
           id="runs2"
           type="line"
           paint={{
-            "line-color": "rgb(224,237,94)",
-            "line-width": 1,
+            'line-color': 'rgb(224,237,94)',
+            'line-width': isBigMap ? 1 : 2,
           }}
           layout={{
-            "line-join": "round",
-            "line-cap": "round",
+            'line-join': 'round',
+            'line-cap': 'round',
           }}
-        /> :
-          <Layer
-            id="runs2"
-            type="line"
-            paint={{
-              "line-color": "rgb(224,237,94)",
-              "line-width": 2,
-            }}
-            layout={{
-              "line-join": "round",
-              "line-cap": "round",
-            }}
-          />
-        }
+        />
         <Layer
           id="prvince"
           type="fill"
           paint={{
-            "fill-color": "#47b8e0",
+            'fill-color': '#47b8e0',
           }}
           filter={filterProvinces}
         />
@@ -411,11 +394,11 @@ const RunMapWithViewport = (props) => (
 const RunMapButtons = ({ changeYear }) => {
   const [index, setIndex] = useState(0);
   const handleClick = (e, year) => {
-    let elementIndex = yearsArr.indexOf(year);
-    e.target.style.color = "rgb(224,237,94)";
+    const elementIndex = yearsArr.indexOf(year);
+    e.target.style.color = 'rgb(224,237,94)';
 
-    let elements = document.getElementsByClassName(styles.button);
-    elements[index].style.color = "white";
+    const elements = document.getElementsByClassName(styles.button);
+    elements[index].style.color = 'white';
     setIndex(elementIndex);
   };
   return (
@@ -423,8 +406,8 @@ const RunMapButtons = ({ changeYear }) => {
       <ul className={styles.buttons}>
         {yearsArr.map((year) => (
           <li
-            key={year + 'button'}
-            style={{ color: year === "2020" ? "rgb(224,237,94)" : "white" }}
+            key={`${year}button`}
+            style={{ color: year === '2020' ? 'rgb(224,237,94)' : 'white' }}
             year={year}
             onClick={(e) => {
               changeYear(year);
@@ -444,12 +427,10 @@ const RunTable = ({ runs, year, locateActivity }) => {
   const [runIndex, setRunIndex] = useState(-1);
   if (!yearsArr.includes(year)) {
     // When total show 2020
-    year = "2020";
+    year = '2020';
   }
   runs = runs.filter((run) => run.start_date_local.slice(0, 4) === year);
-  runs = runs.sort((a, b) => {
-    return new Date(b.start_date_local) - new Date(a.start_date_local);
-  });
+  runs = runs.sort((a, b) => new Date(b.start_date_local) - new Date(a.start_date_local));
   return (
     <div className={styles.tableContainer}>
       <table className={styles.runTable} cellSpacing="0" cellPadding="0">
@@ -479,10 +460,11 @@ const RunTable = ({ runs, year, locateActivity }) => {
   );
 };
 
-const RunRow = ({ runs, run, locateActivity, runIndex, setRunIndex }) => {
+const RunRow = ({
+  runs, run, locateActivity, runIndex, setRunIndex,
+}) => {
   const distance = (run.distance / 1000.0).toFixed(1);
   const pace = run.average_speed;
-  const { country, province, city } = locationForRun(run)
 
   const paceParts = pace ? formatPace(pace) : null;
 
@@ -490,12 +472,12 @@ const RunRow = ({ runs, run, locateActivity, runIndex, setRunIndex }) => {
 
   // change click color
   const handleClick = (e, runs, run) => {
-    let elementIndex = runs.indexOf(run);
-    e.target.parentElement.style.color = "red";
+    const elementIndex = runs.indexOf(run);
+    e.target.parentElement.style.color = 'red';
 
-    let elements = document.getElementsByClassName(styles.runRow);
+    const elements = document.getElementsByClassName(styles.runRow);
     if (runIndex !== -1) {
-      elements[runIndex].style.color = "rgb(224,237,94)";
+      elements[runIndex].style.color = 'rgb(224,237,94)';
     }
     setRunIndex(elementIndex);
   };
@@ -518,18 +500,17 @@ const RunRow = ({ runs, run, locateActivity, runIndex, setRunIndex }) => {
   );
 };
 
-const Stat = ({ value, description, className }) => {
-  return (
-    <div className={`${className} pb2 w-100`}>
-      <span className="f1 fw9 i">{intComma(value)}</span>
-      <span className="f3 fw6 i">{description}</span>
-    </div>
-  );
-};
+const Stat = ({
+  value, description, className, citySize,
+}) => (
+  <div className={`${className} pb2 w-100`}>
+    <span className={`f${citySize || 1} fw9 i`}>{intComma(value)}</span>
+    <span className="f3 fw6 i">{description}</span>
+  </div>
+);
 
 // Utilities
-
-const intComma = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+const intComma = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
 const pathForRun = (run) => {
   try {
@@ -549,7 +530,7 @@ const geoJsonForRuns = (runs, year) => {
     runs = runs.filter((run) => run.start_date_local.slice(0, 4) === year);
   }
   return {
-    type: "FeatureCollection",
+    type: 'FeatureCollection',
     features: runs.map((run) => {
       const points = pathForRun(run);
       if (!points) {
@@ -557,9 +538,9 @@ const geoJsonForRuns = (runs, year) => {
       }
 
       return {
-        type: "Feature",
+        type: 'Feature',
         geometry: {
-          type: "LineString",
+          type: 'LineString',
           coordinates: points,
         },
       };
@@ -567,27 +548,24 @@ const geoJsonForRuns = (runs, year) => {
   };
 };
 
-const geoJsonForMap = () => {
-  return chinaGeojson
-};
-
+const geoJsonForMap = () => chinaGeojson;
 
 const titleForRun = (run) => {
-  if (run.name.slice(0, 7) === "Running") {
-    return "Run";
+  if (run.name.slice(0, 7) === 'Running') {
+    return 'Run';
   }
   if (run.name) {
     return run.name;
   }
-  return "Run";
+  return 'Run';
 };
 
 const titleForShow = (run) => {
   const date = run.start_date_local.slice(0, 11);
   const distance = (run.distance / 1000.0).toFixed(1);
-  let name = "Run";
-  if (run.name.slice(0, 7) === "Running") {
-    name = "run";
+  let name = 'Run';
+  if (run.name.slice(0, 7) === 'Running') {
+    name = 'run';
   }
   if (run.name) {
     name = run.name;
@@ -599,12 +577,12 @@ const formatPace = (d) => {
   const pace = (1000.0 / 60.0) * (1.0 / d);
   const minutes = Math.floor(pace);
   const seconds = Math.floor((pace - minutes) * 60.0);
-  return `${minutes}:${seconds.toFixed(0).toString().padStart(2, "0")}`;
+  return `${minutes}:${seconds.toFixed(0).toString().padStart(2, '0')}`;
 };
 
 // for scroll to the map
 const scrollToMap = () => {
-  let el = document.querySelector(".fl.w-100.w-70-l");
+  const el = document.querySelector('.fl.w-100.w-70-l');
   const rect = el.getBoundingClientRect();
   window.scroll(rect.left + window.scrollX, rect.top + window.scrollY);
 };
