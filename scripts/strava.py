@@ -21,7 +21,6 @@ GPX_FOLDER = os.path.join(os.getcwd(), "gpx_output")
 def make_client(client_id, client_secret, refresh_token):
     client = Client()
 
-    # refresh_response = client.refresh_access_token(client_id="50523", client_secret="d31053005599ce01b79c7f6ab2eec6c487ab400c", refresh_token="44dfae8b149e5020546a0ed00acf5a108126bc0f")
     refresh_response = client.refresh_access_token(
         client_id=client_id, client_secret=client_secret, refresh_token=refresh_token
     )

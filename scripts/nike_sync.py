@@ -114,13 +114,17 @@ def activity_name(activity):
 
 
 def get_last_id():
-    file_names = os.listdir(OUTPUT_DIR)
-    file_names.sort()
-    file_name = file_names[-1]
-    with open(os.path.join(OUTPUT_DIR, file_name)) as f:
-        data = json.load(f)
-    logger.info(f"Last update from {data['id']}")
-    return data["id"]
+    try:
+        file_names = os.listdir(OUTPUT_DIR)
+        file_names.sort()
+        file_name = file_names[-1]
+        with open(os.path.join(OUTPUT_DIR, file_name)) as f:
+            data = json.load(f)
+        logger.info(f"Last update from {data['id']}")
+        return data["id"]
+    # easy solution when error happens no last id
+    except:
+        return None
 
 
 def sanitise_json(d):
