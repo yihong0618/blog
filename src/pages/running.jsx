@@ -430,8 +430,8 @@ const RunTable = ({ runs, year, locateActivity }) => {
     year = '2020';
   }
   runs = runs.filter((run) => run.start_date_local.slice(0, 4) === year);
-  // runs.sort((a, b) => new Date(b.start_date_local) - new Date(a.start_date_local));
-  runs.sort((a, b) => b.distance - a.distance);
+  runs.sort((a, b) => (new Date(b.start_date_local)).getTime() - (new Date(a.start_date_local)).getTime());
+  
   return (
     <div className={styles.tableContainer}>
       <table className={styles.runTable} cellSpacing="0" cellPadding="0">
