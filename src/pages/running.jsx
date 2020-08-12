@@ -431,7 +431,7 @@ const RunTable = ({ runs, year, locateActivity }) => {
   }
   runs = runs.filter((run) => run.start_date_local.slice(0, 4) === year);
   runs.sort((a, b) => new Date(b.start_date_local.replace(" ", "T")) - new Date(a.start_date_local.replace(" ", "T")));
-  
+
   return (
     <div className={styles.tableContainer}>
       <table className={styles.runTable} cellSpacing="0" cellPadding="0">
