@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import { Helmet } from 'react-helmet';
 import * as mapboxPolyline from '@mapbox/polyline';
 import MapboxLanguage from '@mapbox/mapbox-gl-language';
@@ -132,7 +132,31 @@ export default () => {
     scrollToMap();
     setTitle(titleForShow(run));
   };
-  // document.querySelector("rect").addEventListener("click", () => alert("clicked"))
+  
+  useEffect(() => {
+    let rectArr = document.querySelectorAll("rect");
+    if (rectArr.length !== 0) {
+      rectArr = Array.from(rectArr).slice(1)
+    }
+    
+    rectArr.forEach((rect) => {
+      const rectColor = rect.getAttribute("fill");
+      // not run has no click event
+      if (rectColor !== "#444444") {
+        const runDate = rect.innerHTML;
+        const [runName] = runDate.match(/\d{4}-\d{1,2}-\d{1,2}/)
+        let run = runs.filter(
+          (r) => r.start_date_local.slice(0, 10) === runName
+        ).sort((a, b) => b.distance - a.distance)[0]
+        
+        // do not add the event next time
+        // maybe a better way?
+        if (run) {
+          rect.onclick = () => locateActivity(run);
+        }
+      }
+    })
+  });
 
   return (
     <>

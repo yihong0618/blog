@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("strava")
 
 GET_DIR = "data/activities"
-GPX_FOLDER = os.path.join(os.getcwd(), "gpx_output")
+GPX_FOLDER = os.path.join(os.getcwd(), "GPX_OUT")
 
 
 def make_client(client_id, client_secret, refresh_token):
@@ -183,6 +183,8 @@ def upload_gpx(file_name):
 
 
 def make_new_gpxs(files):
+    if not files:
+        return
     if not os.path.exists(GPX_FOLDER):
         os.mkdir(GPX_FOLDER)
     for file in files:
@@ -191,10 +193,13 @@ def make_new_gpxs(files):
                 json_data = json.loads(f.read())
             except JSONDecodeError:
                 pass
+        gpx_name = str(datetime.utcfromtimestamp(int(json_data["start_epoch_ms"]) / 1000).strftime('%Y-%m-%d %H:%M:%S'))
         parsed_data = parse_activity_data(json_data)
         if parsed_data:
-            save_gpx(parsed_data, json_data["id"])
-    gpx_files = os.listdir(GPX_FOLDER)
+            save_gpx(parsed_data, gpx_name)
+    gpx_files = sorted(os.listdir(GPX_FOLDER))
+    # get new
+    gpx_files = gpx_files[-len(files):]
     for f in gpx_files:
         upload_gpx(GPX_FOLDER + "/" + f)
         logger.info(f +" uploaded")
