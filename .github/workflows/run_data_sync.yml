@@ -10,6 +10,7 @@ on:
       - scripts/nike_sync.py
       - scripts/strava.py
       - scripts/gen_json.py
+      - scripts/gpxtrackposter/cli.py
       - requirements.txt
 
 jobs:
@@ -66,7 +67,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "Add new runs"
-          files: data/activities/ src/static/ scripts/data.db
+          files: data/activities/ src/static/ scripts/data.db assets/
           rebase: 'true'
           name: yihong0618 
           email: zouzou0208@gmail.com

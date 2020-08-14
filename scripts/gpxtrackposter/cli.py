@@ -288,6 +288,7 @@ def main():
 
 if __name__ == "__main__":
     try:
+        # generate svg
         main()
     except PosterError as e:
         print(e)
