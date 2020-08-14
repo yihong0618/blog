@@ -21,6 +21,10 @@ sniffio==1.1.0            # via httpx
 urllib3==1.25.8           # via httpx
 gpxpy==1.4.2
 stravalib==0.10.2
+appdirs>=1.4.0
+svgwrite>=1.1.9
+colour
+s2sphere
 arrow
 geopy
 polyline

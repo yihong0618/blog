@@ -55,6 +55,11 @@ jobs:
         run: |
           source venv/bin/activate
           python scripts/gen_json.py ${{ secrets.S_CLIENT_ID }} ${{ secrets.S_CLIENT_SECRET }} ${{ secrets.S_REFRESH_TOKEN}}
+        
+      - name: Make svg GitHub profile
+        run: |
+          source venv/bin/activate
+          python scripts/gpxtrackposter/cli.py  --language zh_CN --gpx-dir ./GPX_OUT --title "伊洪的旅程" --type github --athlete "伊洪" --special-distance 10 --special-distance2 20 --special-color yellow --special-color2 red --output assets/github.svg
 
       - name: Push new runs
         uses: github-actions-x/commit@v2.6

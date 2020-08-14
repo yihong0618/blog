@@ -1,5 +1,6 @@
 # Project dependencies
 .cache
+*.pyc
 node_modules
 yarn-error.log
 

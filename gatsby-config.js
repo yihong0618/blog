@@ -75,6 +75,14 @@ module.exports = {
         ignore: ["**/.(js|jsx|scss)"],
       },
     },
+    {
+      resolve: 'gatsby-plugin-react-svg',
+      options: {
+        rule: {
+          include: /assets/
+        }
+      }
+    },
     "gatsby-transformer-sharp",
     "gatsby-plugin-sharp",
     //"gatsby-redirect-from",

@@ -8,6 +8,7 @@ import { ViewportProvider, useDimensions } from 'react-viewport-utils';
 import Layout from '../components/layout';
 import { activities } from '../static/activities';
 import { chinaGeojson } from '../static/run_countries';
+import GitHubSvg from '../../assets/github.svg';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import styles from './running.module.scss';
@@ -131,6 +132,7 @@ export default () => {
     scrollToMap();
     setTitle(titleForShow(run));
   };
+  // document.querySelector("rect").addEventListener("click", () => alert("clicked"))
 
   return (
     <>
@@ -161,11 +163,14 @@ export default () => {
                 changeYear={changeYear}
               />
             )}
-            <RunTable
-              runs={activities}
-              year={year}
-              locateActivity={locateActivity}
-            />
+            {year == 'Total' ? <GitHubSvg className={styles.runSVG} />
+              : (
+                <RunTable
+                  runs={activities}
+                  year={year}
+                  locateActivity={locateActivity}
+                />
+              )}
           </div>
         </div>
       </Layout>
@@ -430,7 +435,7 @@ const RunTable = ({ runs, year, locateActivity }) => {
     year = '2020';
   }
   runs = runs.filter((run) => run.start_date_local.slice(0, 4) === year);
-  runs.sort((a, b) => new Date(b.start_date_local.replace(" ", "T")) - new Date(a.start_date_local.replace(" ", "T")));
+  runs.sort((a, b) => new Date(b.start_date_local.replace(' ', 'T')) - new Date(a.start_date_local.replace(' ', 'T')));
 
   return (
     <div className={styles.tableContainer}>
