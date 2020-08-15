@@ -221,7 +221,8 @@ if __name__ == "__main__":
         client = make_client(
             options.client_id, options.client_secret, options.refresh_token
         )
-
+    
     last_time = get_last_time(client)
+    # change here to manual
     files = get_to_generate_files(last_time)
     make_new_gpxs(files)
