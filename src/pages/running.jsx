@@ -9,6 +9,7 @@ import Layout from '../components/layout';
 import { activities } from '../static/activities';
 import { chinaGeojson } from '../static/run_countries';
 import GitHubSvg from '../../assets/github.svg';
+import GridSvg from '../../assets/grid.svg';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import styles from './running.module.scss';
@@ -133,6 +134,7 @@ export default () => {
     setTitle(titleForShow(run));
   };
   
+  // TODO refactor
   useEffect(() => {
     let rectArr = document.querySelectorAll("rect");
     if (rectArr.length !== 0) {
@@ -144,7 +146,7 @@ export default () => {
       // not run has no click event
       if (rectColor !== "#444444") {
         const runDate = rect.innerHTML;
-        const [runName] = runDate.match(/\d{4}-\d{1,2}-\d{1,2}/)
+        const [runName] = runDate.match(/\d{4}-\d{1,2}-\d{1,2}/) || ["2021"]
         let run = runs.filter(
           (r) => r.start_date_local.slice(0, 10) === runName
         ).sort((a, b) => b.distance - a.distance)[0]
@@ -156,6 +158,25 @@ export default () => {
         }
       }
     })
+    let polylineArr = document.querySelectorAll("polyline");
+    if (polylineArr.length !== 0) {
+      polylineArr = Array.from(polylineArr).slice(1)
+    }
+    polylineArr.forEach((polyline) => {
+      // not run has no click event
+        const runDate = polyline.innerHTML;
+        const [runName] = runDate.match(/\d{4}-\d{1,2}-\d{1,2}/) || ["2021"]
+        let run = runs.filter(
+          (r) => r.start_date_local.slice(0, 10) === runName
+        ).sort((a, b) => b.distance - a.distance)[0]
+        
+        // do not add the event next time
+        // maybe a better way?
+        if (run) {
+          polyline.onclick = () => locateActivity(run);
+        }
+      }
+    )
   });
 
   return (
@@ -187,7 +208,7 @@ export default () => {
                 changeYear={changeYear}
               />
             )}
-            {year == 'Total' ? <GitHubSvg className={styles.runSVG} />
+            {year == 'Total' ? <SVGStat />
               : (
                 <RunTable
                   runs={activities}
@@ -200,6 +221,15 @@ export default () => {
       </Layout>
     </>
   );
+};
+
+const SVGStat = () => {
+  return (
+    <div>
+      <GitHubSvg className={styles.runSVG} />
+      <GridSvg className={styles.runSVG} />
+    </div>
+  )
 };
 
 // Child components
@@ -219,12 +249,6 @@ const YearsStat = ({ runs, year, onClick }) => {
           {year}
           的数据
           <br />
-          现在我用NRC记录自己跑步
-          {' '}
-          <a className="dark-gray b" href="https://www.nike.com/nrc-app">
-            Nike Run Club
-          </a>
-          {' '}
           希望能激励自己前行，不要停下来。这个展示也是我学习React的第一个项目，
           希望自己有所成长。
           <br />
@@ -347,6 +371,7 @@ const RunMap = ({
   const [lastWidth, setLastWidth] = useState(0);
   const addControlHandler = (event) => {
     const map = event && event.target;
+    // set lauguage to Chinese if you use English please comment it 
     if (map) {
       map.addControl(
         new MapboxLanguage({
@@ -360,6 +385,7 @@ const RunMap = ({
     }
   };
   const filterProvinces = provinces.slice();
+  // for geojson format
   filterProvinces.unshift('in', 'name');
 
   const dimensions = useDimensions({
@@ -421,9 +447,11 @@ const RunMapWithViewport = (props) => (
 );
 
 const RunMapButtons = ({ changeYear }) => {
+  const yearsButtons = yearsArr.slice();
+  yearsButtons.push("Total")
   const [index, setIndex] = useState(0);
   const handleClick = (e, year) => {
-    const elementIndex = yearsArr.indexOf(year);
+    const elementIndex = yearsButtons.indexOf(year);
     e.target.style.color = 'rgb(224,237,94)';
 
     const elements = document.getElementsByClassName(styles.button);
@@ -433,7 +461,7 @@ const RunMapButtons = ({ changeYear }) => {
   return (
     <div>
       <ul className={styles.buttons}>
-        {yearsArr.map((year) => (
+        {yearsButtons.map((year) => (
           <li
             key={`${year}button`}
             style={{ color: year === '2020' ? 'rgb(224,237,94)' : 'white' }}

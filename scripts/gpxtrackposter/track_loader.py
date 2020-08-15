@@ -54,7 +54,7 @@ class TrackLoader:
     """
 
     def __init__(self):
-        self.min_length = 1000
+        self.min_length = 10000
         self.special_file_names = []
         self.year_range = YearRange()
         self.cache_dir = None
