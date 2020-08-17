@@ -223,6 +223,14 @@ def main():
         default=20.0,
         help="Special Distance2 by km and corlor with the special_color2",
     )
+    args_parser.add_argument(
+        "--min-distance",
+        dest="min_distance",
+        metavar="DISTANCE",
+        type=float,
+        default=1.0,
+        help="min distance by km for track filter",
+    )
 
     for _, drawer in drawers.items():
         drawer.create_args(args_parser)
@@ -246,6 +254,7 @@ def main():
         raise ParameterError(f"Bad year range: {args.year}.")
 
     loader.special_file_names = args.special
+    loader.min_length = args.min_distance * 1000
     if args.clear_cache:
         print("Clearing cache...")
         loader.clear_cache()
