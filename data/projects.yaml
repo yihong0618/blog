@@ -45,6 +45,14 @@
     - Python
     - JavaScript
 
+- name: Runtastic
+  role: author
+  primary: true
+  description: Download all your Runtastic (Adidas Running) activities save to gpx
+  repo: yihong0618/Runtastic
+  languages:
+    - Python
+
 - name: blog
   role: author
   primary: false
@@ -52,6 +60,14 @@
   repo: yihong0618/blog
   languages:
     - JavaScript
+
+- name: gitblog
+  role: author
+  primary: false
+  description: GihHub Issues blog using GihHub Action to auto generate README 
+  repo: yihong0618/gitblog
+  languages:
+    - Python
 
 - name: Python365
   role: author

@@ -3,7 +3,7 @@ title: "Hello World"
 list_title: "你好这个世界"
 date: 2020-06-25
 featured: true
-theme: light-gray-purple
+theme: run
 hidden: false
 ---
 
