@@ -11,10 +11,10 @@ import GitHubSvg from '../../assets/github.svg';
 import GridSvg from '../../assets/grid.svg';
 import {
   titleForShow, formatPace, scrollToMap, locationForRun, intComma, geoJsonForRuns, geoJsonForMap, titleForRun,
-} from './utils';
+} from '../utils/utils';
 import {
   MAPBOX_TOKEN, SHENYANG_YEARS_ARR, DALIAN_STRAT_POINT, SHENYANG_START_POINT,
-} from './const';
+} from '../utils/const';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import styles from './running.module.scss';
