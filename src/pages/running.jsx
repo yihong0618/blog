@@ -64,7 +64,6 @@ export default () => {
     ? SHENYANG_START_POINT
     : DALIAN_STRAT_POINT;
   const [runs, setActivity] = useState(filterAndSortRuns(activities, year));
-  const [run, setRun] = useState("")
   const [title, setTitle] = useState('');
   const [viewport, setViewport] = useState({
     width: '100%',
@@ -88,6 +87,7 @@ export default () => {
       setActivity(activities)
     }
     if (viewport.zoom > 3) {
+      console.log(onStartPoint, year)
       setViewport({
         width: '100%',
         height: 400,
@@ -100,10 +100,19 @@ export default () => {
   };
 
   const locateActivity = (run) => {
-    setRun(run)
     setGeoData(geoJsonForRuns([run]))
+    setTitle(titleForShow(run));
+  };
+
+  useEffect(() => {
+    setGeoData(geoJsonForRuns(runs))
+  }, [year]);
+
+  useEffect(() => {
     let startPoint;
-    const { coordinates } = geoData.features[0].geometry;
+    const featuresLength = geoData.features.length
+    const { coordinates } = geoData.features[featuresLength-1].geometry;
+    const isSingleRun = featuresLength === 1
     if (coordinates.length === 0) {
       startPoint = DALIAN_STRAT_POINT.reverse();
     } else {
@@ -114,37 +123,11 @@ export default () => {
       height: 400,
       latitude: startPoint[1],
       longitude: startPoint[0],
-      zoom: 14.5,
+      // if by year not single run
+      zoom: isSingleRun ? 14.5: 11.5,
     });
     scrollToMap();
-    setTitle(titleForShow(run));
-  
-  };
-
-  useEffect(() => {
-    setGeoData(geoJsonForRuns(runs))
-  }, [year]);
-
-  // useEffect(() => {
-  //   let startPoint;
-  //   // setGeoData(geoJsonForRuns([run]));
-  //   const { coordinates } = geoData.features[0].geometry;
-  //   if (coordinates.length === 0) {
-  //     startPoint = DALIAN_STRAT_POINT.reverse();
-  //   } else {
-  //     startPoint = coordinates[Math.floor(coordinates.length / 2)];
-  //   }
-  //   setViewport({
-  //     width: '100%',
-  //     height: 400,
-  //     latitude: startPoint[1],
-  //     longitude: startPoint[0],
-  //     zoom: 14.5,
-  //   });
-  //   scrollToMap();
-  //   setTitle(titleForShow(run));
-  // }, [run]);
-
+  }, [geoData]);
 
   // TODO refactor
   useEffect(() => {
@@ -497,7 +480,6 @@ const RunTable = ({ runs, year, locateActivity}) => {
     // When total show 2020
     year = '2020';
   }
-  // runs.sort((a, b) => new Date(b.start_date_local.replace(' ', 'T')) - new Date(a.start_date_local.replace(' ', 'T')));
 
   return (
     <div className={styles.tableContainer}>
