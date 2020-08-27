@@ -56,10 +56,14 @@ export default () => {
   const thisYear = yearsArr[0];
   const [year, setYear] = useState(thisYear);
   const filterYearRuns = ((run, year) => run.start_date_local.slice(0, 4) === year)
+  const filterAndSortRuns = (activities, year) => {
+    let s = activities.filter((run) => filterYearRuns(run, year))
+    return s.sort((a, b) => new Date(b.start_date_local.replace(' ', 'T')) - new Date(a.start_date_local.replace(' ', 'T')))
+  }
   let onStartPoint = SHENYANG_YEARS_ARR.includes(year)
     ? SHENYANG_START_POINT
     : DALIAN_STRAT_POINT;
-  const [runs, setActivity] = useState(activities.filter((run) => filterYearRuns(run, year)));
+  const [runs, setActivity] = useState(filterAndSortRuns(activities, year));
   const [run, setRun] = useState("")
   const [title, setTitle] = useState('');
   const [viewport, setViewport] = useState({
@@ -79,7 +83,7 @@ export default () => {
       : DALIAN_STRAT_POINT;
     scrollToMap();
     if (year !== "Total") {
-      setActivity(activities.filter((run) => filterYearRuns(run, year)));
+      setActivity(filterAndSortRuns(activities, year));
     } else {
       setActivity(activities)
     }
@@ -95,20 +99,10 @@ export default () => {
     setTitle(`${year} Running Heatmap`);
   };
 
-  // use effect here 
-
   const locateActivity = (run) => {
     setRun(run)
     setGeoData(geoJsonForRuns([run]))
-  };
-
-  useEffect(() => {
-    setGeoData(geoJsonForRuns(runs))
-  }, [year]);
-
-  useEffect(() => {
     let startPoint;
-    // setGeoData(geoJsonForRuns([run]));
     const { coordinates } = geoData.features[0].geometry;
     if (coordinates.length === 0) {
       startPoint = DALIAN_STRAT_POINT.reverse();
@@ -124,7 +118,32 @@ export default () => {
     });
     scrollToMap();
     setTitle(titleForShow(run));
-  }, [run]);
+  
+  };
+
+  useEffect(() => {
+    setGeoData(geoJsonForRuns(runs))
+  }, [year]);
+
+  // useEffect(() => {
+  //   let startPoint;
+  //   // setGeoData(geoJsonForRuns([run]));
+  //   const { coordinates } = geoData.features[0].geometry;
+  //   if (coordinates.length === 0) {
+  //     startPoint = DALIAN_STRAT_POINT.reverse();
+  //   } else {
+  //     startPoint = coordinates[Math.floor(coordinates.length / 2)];
+  //   }
+  //   setViewport({
+  //     width: '100%',
+  //     height: 400,
+  //     latitude: startPoint[1],
+  //     longitude: startPoint[0],
+  //     zoom: 14.5,
+  //   });
+  //   scrollToMap();
+  //   setTitle(titleForShow(run));
+  // }, [run]);
 
 
   // TODO refactor
@@ -359,9 +378,7 @@ const RunMap = ({
   runs, year, title, viewport, setViewport, changeYear, geoData
 }) => {
   year = year || '2020';
-  // let geoData = geoJsonForRuns(runs, year, yearsArr);
 
-  console.log(geoData)
   const [lastWidth, setLastWidth] = useState(0);
   const addControlHandler = (event) => {
     const map = event && event.target;
