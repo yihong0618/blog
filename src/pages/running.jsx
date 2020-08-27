@@ -1,55 +1,28 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Helmet } from 'react-helmet';
-import * as mapboxPolyline from '@mapbox/polyline';
 import MapboxLanguage from '@mapbox/mapbox-gl-language';
 import ReactMapGL, { Source, Layer } from 'react-map-gl';
 import { ViewportProvider, useDimensions } from 'react-viewport-utils';
 
+
 import Layout from '../components/layout';
 import { activities } from '../static/activities';
-import { chinaGeojson } from '../static/run_countries';
 import GitHubSvg from '../../assets/github.svg';
 import GridSvg from '../../assets/grid.svg';
+import {
+  titleForShow, formatPace, scrollToMap, locationForRun, intComma, geoJsonForRuns, geoJsonForMap, titleForRun,
+} from './utils';
+import {
+  MAPBOX_TOKEN, SHENYANG_YEARS_ARR, DALIAN_STRAT_POINT, SHENYANG_START_POINT,
+} from './const';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import styles from './running.module.scss';
 
-const MAPBOX_TOKEN = 'pk.eyJ1IjoieWlob25nMDYxOCIsImEiOiJja2J3M28xbG4wYzl0MzJxZm0ya2Fua2p2In0.PNKfkeQwYuyGOTT_x9BJ4Q';
-
-// const
-const municipalityCitiesArr = ['北京市', '上海市', '天津市', '重庆市', '香港特别行政区', '澳门特别行政区'];
-const shenyangYearsArr = ['2012', '2013', '2014'];
-const DALIAN_STRAT_POINT = [38.862, 121.514];
-const SHENYANG_START_POINT = [41.78655, 123.31449];
 const cities = {};
 let provinces = [];
 let countries = [];
 let yearsArr = [];
-
-const locationForRun = (run) => {
-  const location = run.location_country;
-  let [city, province, country] = ['', '', ''];
-  if (location) {
-    const cityMatch = location.match(/[\u4e00-\u9fa5]*市/);
-    const provinceMatch = location.match(/[\u4e00-\u9fa5]*省/);
-    if (cityMatch) {
-      [city] = cityMatch;
-    }
-    if (provinceMatch) {
-      [province] = provinceMatch;
-    }
-    const l = location.split(',');
-    const countryMatch = l[l.length - 1].match(/[\u4e00-\u9fa5].*[\u4e00-\u9fa5]/);
-    if (countryMatch) {
-      [country] = countryMatch;
-    }
-  }
-  if (municipalityCitiesArr.includes(city)) {
-    province = city;
-  }
-
-  return { country, province, city };
-};
 
 // generate base attr
 ((runs) => {
@@ -80,11 +53,14 @@ const locationForRun = (run) => {
 
 // Page
 export default () => {
-  const [year, setYear] = useState('2020');
-  let onStartPoint = shenyangYearsArr.includes(year)
+  const thisYear = yearsArr[0];
+  const [year, setYear] = useState(thisYear);
+  const filterYearRuns = ((run, year) => run.start_date_local.slice(0, 4) === year)
+  let onStartPoint = SHENYANG_YEARS_ARR.includes(year)
     ? SHENYANG_START_POINT
     : DALIAN_STRAT_POINT;
-  const [runs, setActivity] = useState(activities);
+  const [runs, setActivity] = useState(activities.filter((run) => filterYearRuns(run, year)));
+  const [run, setRun] = useState("")
   const [title, setTitle] = useState('');
   const [viewport, setViewport] = useState({
     width: '100%',
@@ -93,13 +69,20 @@ export default () => {
     longitude: onStartPoint[1],
     zoom: 11.5,
   });
+  const [geoData, setGeoData] = useState(
+    geoJsonForRuns(runs)
+  )
   const changeYear = (year) => {
     setYear(year);
-    onStartPoint = shenyangYearsArr.includes(year)
+    onStartPoint = SHENYANG_YEARS_ARR.includes(year)
       ? SHENYANG_START_POINT
       : DALIAN_STRAT_POINT;
     scrollToMap();
-    setActivity(activities);
+    if (year !== "Total") {
+      setActivity(activities.filter((run) => filterYearRuns(run, year)));
+    } else {
+      setActivity(activities)
+    }
     if (viewport.zoom > 3) {
       setViewport({
         width: '100%',
@@ -112,11 +95,20 @@ export default () => {
     setTitle(`${year} Running Heatmap`);
   };
 
+  // use effect here 
+
   const locateActivity = (run) => {
-    // TODO maybe filter some activities in the future
-    setActivity([run]);
+    setRun(run)
+    setGeoData(geoJsonForRuns([run]))
+  };
+
+  useEffect(() => {
+    setGeoData(geoJsonForRuns(runs))
+  }, [year]);
+
+  useEffect(() => {
     let startPoint;
-    const geoData = geoJsonForRuns([run], run.start_date_local.slice(0, 4));
+    // setGeoData(geoJsonForRuns([run]));
     const { coordinates } = geoData.features[0].geometry;
     if (coordinates.length === 0) {
       startPoint = DALIAN_STRAT_POINT.reverse();
@@ -132,51 +124,52 @@ export default () => {
     });
     scrollToMap();
     setTitle(titleForShow(run));
-  };
-  
+  }, [run]);
+
+
   // TODO refactor
   useEffect(() => {
-    let rectArr = document.querySelectorAll("rect");
+    let rectArr = document.querySelectorAll('rect');
     if (rectArr.length !== 0) {
-      rectArr = Array.from(rectArr).slice(1)
+      rectArr = Array.from(rectArr).slice(1);
     }
-    
+
     rectArr.forEach((rect) => {
-      const rectColor = rect.getAttribute("fill");
+      const rectColor = rect.getAttribute('fill');
       // not run has no click event
-      if (rectColor !== "#444444") {
+      if (rectColor !== '#444444') {
         const runDate = rect.innerHTML;
-        const [runName] = runDate.match(/\d{4}-\d{1,2}-\d{1,2}/) || ["2021"]
-        let run = runs.filter(
-          (r) => r.start_date_local.slice(0, 10) === runName
-        ).sort((a, b) => b.distance - a.distance)[0]
-        
+        const [runName] = runDate.match(/\d{4}-\d{1,2}-\d{1,2}/) || ['2021'];
+        const runLocate = runs.filter(
+          (r) => r.start_date_local.slice(0, 10) === runName,
+        ).sort((a, b) => b.distance - a.distance)[0];
+
         // do not add the event next time
         // maybe a better way?
-        if (run) {
-          rect.onclick = () => locateActivity(run);
+        if (runLocate) {
+          rect.onclick = () => locateActivity(runLocate);
         }
       }
-    })
-    let polylineArr = document.querySelectorAll("polyline");
+    });
+    let polylineArr = document.querySelectorAll('polyline');
     if (polylineArr.length !== 0) {
-      polylineArr = Array.from(polylineArr).slice(1)
+      polylineArr = Array.from(polylineArr).slice(1);
     }
+    // add picked runs svg event
     polylineArr.forEach((polyline) => {
       // not run has no click event
-        const runDate = polyline.innerHTML;
-        const [runName] = runDate.match(/\d{4}-\d{1,2}-\d{1,2}/) || ["2021"]
-        let run = runs.filter(
-          (r) => r.start_date_local.slice(0, 10) === runName
-        ).sort((a, b) => b.distance - a.distance)[0]
-        
-        // do not add the event next time
-        // maybe a better way?
-        if (run) {
-          polyline.onclick = () => locateActivity(run);
-        }
+      const runDate = polyline.innerHTML;
+      const [runName] = runDate.match(/\d{4}-\d{1,2}-\d{1,2}/) || ['2021'];
+      const run = runs.filter(
+        (r) => r.start_date_local.slice(0, 10) === runName,
+      ).sort((a, b) => b.distance - a.distance)[0];
+
+      // do not add the event next time
+      // maybe a better way?
+      if (run) {
+        polyline.onclick = () => locateActivity(run);
       }
-    )
+    });
   });
 
   return (
@@ -195,23 +188,25 @@ export default () => {
                 year={year}
                 title={title}
                 viewport={viewport}
+                geoData={geoData}
                 setViewport={setViewport}
                 changeYear={changeYear}
               />
             ) : (
               <RunMapWithViewport
-                runs={activities}
+                runs={runs}
                 year={year}
                 title={title}
                 viewport={viewport}
+                geoData={geoData}
                 setViewport={setViewport}
                 changeYear={changeYear}
               />
             )}
-            {year == 'Total' ? <SVGStat />
+            {year === 'Total' ? <SVGStat />
               : (
                 <RunTable
-                  runs={activities}
+                  runs={runs}
                   year={year}
                   locateActivity={locateActivity}
                 />
@@ -223,14 +218,12 @@ export default () => {
   );
 };
 
-const SVGStat = () => {
-  return (
-    <div>
-      <GitHubSvg className={styles.runSVG} />
-      <GridSvg className={styles.runSVG} />
-    </div>
-  )
-};
+const SVGStat = () => (
+  <div>
+    <GitHubSvg className={styles.runSVG} />
+    <GridSvg className={styles.runSVG} />
+  </div>
+);
 
 // Child components
 
@@ -363,15 +356,16 @@ const CitiesStat = () => {
 };
 
 const RunMap = ({
-  runs, year, title, viewport, setViewport, changeYear,
+  runs, year, title, viewport, setViewport, changeYear, geoData
 }) => {
   year = year || '2020';
-  let geoData = geoJsonForRuns(runs, year);
+  // let geoData = geoJsonForRuns(runs, year, yearsArr);
 
+  console.log(geoData)
   const [lastWidth, setLastWidth] = useState(0);
   const addControlHandler = (event) => {
     const map = event && event.target;
-    // set lauguage to Chinese if you use English please comment it 
+    // set lauguage to Chinese if you use English please comment it
     if (map) {
       map.addControl(
         new MapboxLanguage({
@@ -448,7 +442,7 @@ const RunMapWithViewport = (props) => (
 
 const RunMapButtons = ({ changeYear }) => {
   const yearsButtons = yearsArr.slice();
-  yearsButtons.push("Total")
+  yearsButtons.push('Total');
   const [index, setIndex] = useState(0);
   const handleClick = (e, year) => {
     const elementIndex = yearsButtons.indexOf(year);
@@ -480,14 +474,13 @@ const RunMapButtons = ({ changeYear }) => {
   );
 };
 
-const RunTable = ({ runs, year, locateActivity }) => {
+const RunTable = ({ runs, year, locateActivity}) => {
   const [runIndex, setRunIndex] = useState(-1);
   if (!yearsArr.includes(year)) {
     // When total show 2020
     year = '2020';
   }
-  runs = runs.filter((run) => run.start_date_local.slice(0, 4) === year);
-  runs.sort((a, b) => new Date(b.start_date_local.replace(' ', 'T')) - new Date(a.start_date_local.replace(' ', 'T')));
+  // runs.sort((a, b) => new Date(b.start_date_local.replace(' ', 'T')) - new Date(a.start_date_local.replace(' ', 'T')));
 
   return (
     <div className={styles.tableContainer}>
@@ -566,81 +559,3 @@ const Stat = ({
     <span className="f3 fw6 i">{description}</span>
   </div>
 );
-
-// Utilities
-const intComma = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-const pathForRun = (run) => {
-  try {
-    const c = mapboxPolyline.decode(run.summary_polyline);
-    // reverse lat long for mapbox
-    c.forEach((arr) => {
-      [arr[0], arr[1]] = [arr[1], arr[0]];
-    });
-    return c;
-  } catch (err) {
-    return [];
-  }
-};
-
-const geoJsonForRuns = (runs, year) => {
-  if (runs.length > 1 && yearsArr.includes(year)) {
-    runs = runs.filter((run) => run.start_date_local.slice(0, 4) === year);
-  }
-  return {
-    type: 'FeatureCollection',
-    features: runs.map((run) => {
-      const points = pathForRun(run);
-      if (!points) {
-        return null;
-      }
-
-      return {
-        type: 'Feature',
-        geometry: {
-          type: 'LineString',
-          coordinates: points,
-        },
-      };
-    }),
-  };
-};
-
-const geoJsonForMap = () => chinaGeojson;
-
-const titleForRun = (run) => {
-  if (run.name.slice(0, 7) === 'Running') {
-    return 'Run';
-  }
-  if (run.name) {
-    return run.name;
-  }
-  return 'Run';
-};
-
-const titleForShow = (run) => {
-  const date = run.start_date_local.slice(0, 11);
-  const distance = (run.distance / 1000.0).toFixed(1);
-  let name = 'Run';
-  if (run.name.slice(0, 7) === 'Running') {
-    name = 'run';
-  }
-  if (run.name) {
-    name = run.name;
-  }
-  return `${name} ${date} ${distance} KM`;
-};
-
-const formatPace = (d) => {
-  const pace = (1000.0 / 60.0) * (1.0 / d);
-  const minutes = Math.floor(pace);
-  const seconds = Math.floor((pace - minutes) * 60.0);
-  return `${minutes}:${seconds.toFixed(0).toString().padStart(2, '0')}`;
-};
-
-// for scroll to the map
-const scrollToMap = () => {
-  const el = document.querySelector('.fl.w-100.w-70-l');
-  const rect = el.getBoundingClientRect();
-  window.scroll(rect.left + window.scrollX, rect.top + window.scrollY);
-};
