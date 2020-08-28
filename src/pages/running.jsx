@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import MapboxLanguage from '@mapbox/mapbox-gl-language';
 import ReactMapGL, { Source, Layer } from 'react-map-gl';
 import { ViewportProvider, useDimensions } from 'react-viewport-utils';
-
 
 import Layout from '../components/layout';
 import { activities } from '../static/activities';
@@ -16,7 +15,6 @@ import {
   MAPBOX_TOKEN, SHENYANG_YEARS_ARR, DALIAN_STRAT_POINT, SHENYANG_START_POINT,
 } from '../utils/const';
 
-import 'mapbox-gl/dist/mapbox-gl.css';
 import styles from './running.module.scss';
 
 const cities = {};
@@ -51,19 +49,21 @@ let yearsArr = [];
   countries = [...new Set(countries)];
 })(activities);
 
+const filterYearRuns = ((run, year) => run.start_date_local.slice(0, 4) === year);
+const filterAndSortRuns = (activities, year, sortFunc) => {
+  const s = activities.filter((run) => filterYearRuns(run, year));
+  return s.sort(sortFunc);
+};
+
 // Page
 export default () => {
   const thisYear = yearsArr[0];
   const [year, setYear] = useState(thisYear);
-  const filterYearRuns = ((run, year) => run.start_date_local.slice(0, 4) === year)
-  const filterAndSortRuns = (activities, year) => {
-    let s = activities.filter((run) => filterYearRuns(run, year))
-    return s.sort((a, b) => new Date(b.start_date_local.replace(' ', 'T')) - new Date(a.start_date_local.replace(' ', 'T')))
-  }
+  const sortDateFunc = (a, b) => new Date(b.start_date_local.replace(' ', 'T')) - new Date(a.start_date_local.replace(' ', 'T'))
   let onStartPoint = SHENYANG_YEARS_ARR.includes(year)
     ? SHENYANG_START_POINT
     : DALIAN_STRAT_POINT;
-  const [runs, setActivity] = useState(filterAndSortRuns(activities, year));
+  const [runs, setActivity] = useState(filterAndSortRuns(activities, year, sortDateFunc));
   const [title, setTitle] = useState('');
   const [viewport, setViewport] = useState({
     width: '100%',
@@ -73,21 +73,20 @@ export default () => {
     zoom: 11.5,
   });
   const [geoData, setGeoData] = useState(
-    geoJsonForRuns(runs)
-  )
+    geoJsonForRuns(runs),
+  );
   const changeYear = (year) => {
     setYear(year);
     onStartPoint = SHENYANG_YEARS_ARR.includes(year)
       ? SHENYANG_START_POINT
       : DALIAN_STRAT_POINT;
     scrollToMap();
-    if (year !== "Total") {
-      setActivity(filterAndSortRuns(activities, year));
+    if (year !== 'Total') {
+      setActivity(filterAndSortRuns(activities, year, sortDateFunc));
     } else {
-      setActivity(activities)
+      setActivity(activities);
     }
     if (viewport.zoom > 3) {
-      console.log(onStartPoint, year)
       setViewport({
         width: '100%',
         height: 400,
@@ -100,19 +99,19 @@ export default () => {
   };
 
   const locateActivity = (run) => {
-    setGeoData(geoJsonForRuns([run]))
+    setGeoData(geoJsonForRuns([run]));
     setTitle(titleForShow(run));
   };
 
   useEffect(() => {
-    setGeoData(geoJsonForRuns(runs))
+    setGeoData(geoJsonForRuns(runs));
   }, [year]);
 
   useEffect(() => {
     let startPoint;
-    const featuresLength = geoData.features.length
-    const { coordinates } = geoData.features[featuresLength-1].geometry;
-    const isSingleRun = featuresLength === 1
+    const featuresLength = geoData.features.length;
+    const { coordinates } = geoData.features[featuresLength - 1].geometry;
+    const isSingleRun = featuresLength === 1;
     if (coordinates.length === 0) {
       startPoint = DALIAN_STRAT_POINT.reverse();
     } else {
@@ -124,7 +123,7 @@ export default () => {
       latitude: startPoint[1],
       longitude: startPoint[0],
       // if by year not single run
-      zoom: isSingleRun ? 14.5: 11.5,
+      zoom: isSingleRun ? 14.5 : 11.5,
     });
     scrollToMap();
   }, [geoData]);
@@ -211,6 +210,7 @@ export default () => {
                   runs={runs}
                   year={year}
                   locateActivity={locateActivity}
+                  setActivity={setActivity}
                 />
               )}
           </div>
@@ -228,7 +228,6 @@ const SVGStat = () => (
 );
 
 // Child components
-
 const YearsStat = ({ runs, year, onClick }) => {
   // make sure the year click on front
   let yearsArrayUpdate = yearsArr.slice();
@@ -358,7 +357,7 @@ const CitiesStat = () => {
 };
 
 const RunMap = ({
-  runs, year, title, viewport, setViewport, changeYear, geoData
+  runs, year, title, viewport, setViewport, changeYear, geoData,
 }) => {
   year = year || '2020';
 
@@ -474,12 +473,15 @@ const RunMapButtons = ({ changeYear }) => {
   );
 };
 
-const RunTable = ({ runs, year, locateActivity}) => {
+const RunTable = ({ runs, year, locateActivity, setActivity }) => {
   const [runIndex, setRunIndex] = useState(-1);
   if (!yearsArr.includes(year)) {
     // When total show 2020
     year = '2020';
   }
+  const sortKMFunc = (a, b) => (b.distance - a.distance);
+  const sortPaceFunc = (a, b) => (b.average_speed - a.average_speed);
+  const sortBPMFunc = (a, b) => (b.average_heartrate - a.average_heartrate);
 
   return (
     <div className={styles.tableContainer}>
@@ -487,9 +489,9 @@ const RunTable = ({ runs, year, locateActivity}) => {
         <thead>
           <tr>
             <th />
-            <th>KM</th>
-            <th>Pace</th>
-            <th>BPM</th>
+            <th onClick={() => setActivity(filterAndSortRuns(runs, year, sortKMFunc))}>KM</th>
+            <th onClick={() => setActivity(filterAndSortRuns(runs, year, sortPaceFunc))}>Pace</th>
+            <th onClick={() => setActivity(filterAndSortRuns(runs, year, sortBPMFunc))}>BPM</th>
             <th />
           </tr>
         </thead>

@@ -69,25 +69,23 @@ const pathForRun = (run) => {
   }
 };
 
-const geoJsonForRuns = (runs) => {
-  return {
-    type: 'FeatureCollection',
-    features: runs.map((run) => {
-      const points = pathForRun(run);
-      if (!points) {
-        return null;
-      }
+const geoJsonForRuns = (runs) => ({
+  type: 'FeatureCollection',
+  features: runs.map((run) => {
+    const points = pathForRun(run);
+    if (!points) {
+      return null;
+    }
 
-      return {
-        type: 'Feature',
-        geometry: {
-          type: 'LineString',
-          coordinates: points,
-        },
-      };
-    }),
-  };
-};
+    return {
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: points,
+      },
+    };
+  }),
+});
 
 const geoJsonForMap = () => chinaGeojson;
 
@@ -106,10 +104,10 @@ const titleForRun = (run) => {
   if (runHour > 8 && runHour <= 12) {
     return '上午跑步';
   }
-  if (runHour > 12 && runHour<= 18) {
+  if (runHour > 12 && runHour <= 18) {
     return '午后跑步';
   }
-  if (runHour > 18 && runHour<= 21) {
+  if (runHour > 18 && runHour <= 21) {
     return '傍晚跑步';
   }
   return '夜晚跑步';
