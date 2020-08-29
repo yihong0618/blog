@@ -113,6 +113,15 @@ const titleForRun = (run) => {
   return '夜晚跑步';
 };
 
+const filterYearRuns = ((run, year) => run.start_date_local.slice(0, 4) === year);
+const filterAndSortRuns = (activities, year, sortFunc) => {
+  const s = activities.filter((run) => filterYearRuns(run, year));
+  return s.sort(sortFunc);
+};
+
+const sortDateFunc = (a, b) => new Date(b.start_date_local.replace(' ', 'T')) - new Date(a.start_date_local.replace(' ', 'T'));
+const sortDateFuncReverse = (a, b) => new Date(a.start_date_local.replace(' ', 'T')) - new Date(b.start_date_local.replace(' ', 'T'));
+
 export {
-  titleForShow, formatPace, scrollToMap, locationForRun, intComma, pathForRun, geoJsonForRuns, geoJsonForMap, titleForRun,
+  titleForShow, formatPace, scrollToMap, locationForRun, intComma, pathForRun, geoJsonForRuns, geoJsonForMap, titleForRun, filterYearRuns, filterAndSortRuns, sortDateFunc, sortDateFuncReverse,
 };

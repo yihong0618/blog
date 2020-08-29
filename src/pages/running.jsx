@@ -9,7 +9,7 @@ import { activities } from '../static/activities';
 import GitHubSvg from '../../assets/github.svg';
 import GridSvg from '../../assets/grid.svg';
 import {
-  titleForShow, formatPace, scrollToMap, locationForRun, intComma, geoJsonForRuns, geoJsonForMap, titleForRun,
+  titleForShow, formatPace, scrollToMap, locationForRun, intComma, geoJsonForRuns, geoJsonForMap, titleForRun, filterAndSortRuns, sortDateFunc, sortDateFuncReverse,
 } from '../utils/utils';
 import {
   MAPBOX_TOKEN, SHENYANG_YEARS_ARR, DALIAN_STRAT_POINT, SHENYANG_START_POINT,
@@ -49,17 +49,10 @@ let yearsArr = [];
   countries = [...new Set(countries)];
 })(activities);
 
-const filterYearRuns = ((run, year) => run.start_date_local.slice(0, 4) === year);
-const filterAndSortRuns = (activities, year, sortFunc) => {
-  const s = activities.filter((run) => filterYearRuns(run, year));
-  return s.sort(sortFunc);
-};
-
 // Page
 export default () => {
   const thisYear = yearsArr[0];
   const [year, setYear] = useState(thisYear);
-  const sortDateFunc = (a, b) => new Date(b.start_date_local.replace(' ', 'T')) - new Date(a.start_date_local.replace(' ', 'T'))
   let onStartPoint = SHENYANG_YEARS_ARR.includes(year)
     ? SHENYANG_START_POINT
     : DALIAN_STRAT_POINT;
@@ -473,15 +466,36 @@ const RunMapButtons = ({ changeYear }) => {
   );
 };
 
-const RunTable = ({ runs, year, locateActivity, setActivity }) => {
+const RunTable = ({
+  runs, year, locateActivity, setActivity,
+}) => {
   const [runIndex, setRunIndex] = useState(-1);
+  const [sortFuncInfo, setSortFuncInfo] = useState('');
   if (!yearsArr.includes(year)) {
     // When total show 2020
     year = '2020';
   }
-  const sortKMFunc = (a, b) => (b.distance - a.distance);
-  const sortPaceFunc = (a, b) => (b.average_speed - a.average_speed);
-  const sortBPMFunc = (a, b) => (b.average_heartrate - a.average_heartrate);
+  // TODO refactor?
+  const sortKMFunc = (a, b) => (sortFuncInfo === 'KM' ? a.distance - b.distance : b.distance - a.distance);
+  const sortPaceFunc = (a, b) => (sortFuncInfo === 'Pace' ? a.average_speed - b.average_speed : b.average_speed - a.average_speed);
+  const sortBPMFunc = (a, b) => (sortFuncInfo === 'BPM' ? a.average_heartrate - b.average_heartrate : b.average_heartrate - a.average_heartrate);
+  const sortDateFuncClick = sortFuncInfo === 'Date' ? sortDateFunc : sortDateFuncReverse;
+  const sortFuncMap = new Map([
+    ['KM', sortKMFunc],
+    ['Pace', sortPaceFunc],
+    ['BPM', sortBPMFunc],
+    ['Date', sortDateFuncClick],
+  ]);
+  const handleClick = (e) => {
+    const funcName = e.target.innerHTML;
+    if (sortFuncInfo === funcName) {
+      setSortFuncInfo('');
+    } else {
+      setSortFuncInfo(funcName);
+    }
+    const f = sortFuncMap.get(e.target.innerHTML);
+    setActivity(filterAndSortRuns(runs, year, f));
+  };
 
   return (
     <div className={styles.tableContainer}>
@@ -489,10 +503,10 @@ const RunTable = ({ runs, year, locateActivity, setActivity }) => {
         <thead>
           <tr>
             <th />
-            <th onClick={() => setActivity(filterAndSortRuns(runs, year, sortKMFunc))}>KM</th>
-            <th onClick={() => setActivity(filterAndSortRuns(runs, year, sortPaceFunc))}>Pace</th>
-            <th onClick={() => setActivity(filterAndSortRuns(runs, year, sortBPMFunc))}>BPM</th>
-            <th />
+            <th onClick={(e) => handleClick(e)}>KM</th>
+            <th onClick={(e) => handleClick(e)}>Pace</th>
+            <th onClick={(e) => handleClick(e)}>BPM</th>
+            <th onClick={(e) => handleClick(e)}>Date</th>
           </tr>
         </thead>
         <tbody>
