@@ -28,6 +28,7 @@ class Nike:
                 "client_id": NIKE_CLIENT_ID,
                 "grant_type": "refresh_token",
             },
+            timeout=60
         )
         response.raise_for_status()
 
