@@ -170,7 +170,7 @@ export default () => {
         polyline.onclick = () => locateActivity(run);
       }
     });
-  });
+  }, [year]);
 
   return (
     <>
