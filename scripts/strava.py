@@ -193,7 +193,7 @@ def make_new_gpxs(files):
                 json_data = json.loads(f.read())
             except JSONDecodeError:
                 pass
-        gpx_name = str(datetime.utcfromtimestamp(int(json_data["start_epoch_ms"]) / 1000).strftime('%Y-%m-%d %H:%M:%S'))
+        gpx_name = str(datetime.utcfromtimestamp(int(json_data["start_epoch_ms"]) / 1000).strftime('%Y-%m-%d %H-%M-%S'))
         parsed_data = parse_activity_data(json_data)
         if parsed_data:
             save_gpx(parsed_data, gpx_name)
