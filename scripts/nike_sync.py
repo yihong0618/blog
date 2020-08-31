@@ -101,18 +101,6 @@ def save_activity(activity):
         raise
 
 
-def activity_name(activity):
-    tags = activity["tags"]
-    if "com.nike.name" in tags:
-        return tags["com.nike.name"]
-    elif "com.nike.running.audioguidedrun" in tags:
-        return tags["com.nike.running.audioguidedrun"].replace("_", " ").title()
-    elif "location" in tags:
-        return f"{tags['location']} run".title()
-    else:
-        return activity["type"].title()
-
-
 def get_last_id():
     try:
         file_names = os.listdir(OUTPUT_DIR)

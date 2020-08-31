@@ -18,6 +18,7 @@ import {
 import styles from './running.module.scss';
 
 const cities = {};
+const runPeriod = {};
 let provinces = [];
 let countries = [];
 let yearsArr = [];
@@ -28,6 +29,10 @@ let yearsArr = [];
   runs.forEach(
     (run) => {
       const location = locationForRun(run);
+      const periodName = titleForRun(run);
+      if (periodName) {
+        runPeriod[periodName] = (runPeriod[periodName] === undefined ? 1 : runPeriod[periodName] + 1);
+      }
       locationsList.push(location);
       const { city, province, country } = location;
       // drop only one char city
@@ -48,6 +53,7 @@ let yearsArr = [];
   provinces = [...new Set(provinces)];
   countries = [...new Set(countries)];
 })(activities);
+
 
 // Page
 export default () => {
@@ -265,6 +271,7 @@ const LocationStat = ({ runs, location, onClick }) => (
     <hr color="red" />
     <LocationSummary key="locationsSummary" />
     <CitiesStat />
+    <PeriodStat />
     <YearStat key="Total" runs={runs} year="Total" onClick={onClick} />
   </div>
 );
@@ -341,13 +348,30 @@ const CitiesStat = () => {
     <div style={{ cursor: 'pointer' }}>
       <section>
         {citiesArr.map(([city, distance]) => (
-          <Stat value={city} description={` ${(distance / 1000).toFixed(0)} KM`} citySize={3} />
+          <Stat key={city} value={city} description={` ${(distance / 1000).toFixed(0)} KM`} citySize={3} />
         ))}
       </section>
       <hr color="red" />
     </div>
   );
 };
+
+const PeriodStat = () => {
+  const periodArr = Object.entries(runPeriod);
+  periodArr.sort((a, b) => b[1] - a[1]);
+  return (
+    <div style={{ cursor: 'pointer' }}>
+      <section>
+        {periodArr.map(([period, times]) => (
+          <Stat key={period} value={period} description={` ${times} Runs`} citySize={3} />
+        ))}
+      </section>
+      <hr color="red" />
+    </div>
+  );
+};
+
+
 
 const RunMap = ({
   runs, year, title, viewport, setViewport, changeYear, geoData,
