@@ -14,7 +14,7 @@ from stravalib.client import Client
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("strava")
 
-GET_DIR = "data/activities"
+GET_DIR = "activities"
 GPX_FOLDER = os.path.join(os.getcwd(), "GPX_OUT")
 
 

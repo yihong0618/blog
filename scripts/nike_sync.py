@@ -10,7 +10,7 @@ import httpx
 
 BASE_URL = "https://api.nike.com/sport/v3/me"
 TOKEN_REFRESH_URL = "https://unite.nike.com/tokenRefresh"
-OUTPUT_DIR = "data/activities"
+OUTPUT_DIR = "activities"
 NIKE_CLIENT_ID = "HlHa2Cje3ctlaOqnxvgZXNaAs7T9nAuH"
 
 logging.basicConfig(level=logging.INFO)
