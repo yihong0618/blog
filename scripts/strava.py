@@ -29,10 +29,16 @@ def make_client(client_id, client_secret, refresh_token):
 
 
 def get_last_time(client):
-    activate = next(client.get_activities(limit=3))
-    # add 30 minutes to make sure after the end of this activate
-    end_date = activate.start_date + activate.elapsed_time + timedelta(minutes=30)
-    return int(datetime.timestamp(end_date) * 1000)
+    """
+    if there is no activities cause exception return 0
+    """
+    try:
+        activate = next(client.get_activities(limit=3))
+        # add 30 minutes to make sure after the end of this activate
+        end_date = activate.start_date + activate.elapsed_time + timedelta(minutes=30)
+        return int(datetime.timestamp(end_date) * 1000)
+    except:
+        return 0
 
 
 def get_to_generate_files(last_time):
@@ -221,7 +227,6 @@ if __name__ == "__main__":
         client = make_client(
             options.client_id, options.client_secret, options.refresh_token
         )
-    
     last_time = get_last_time(client)
     # change here to manual
     files = get_to_generate_files(last_time)
