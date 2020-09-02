@@ -77,11 +77,7 @@ export default () => {
   const changeYear = (y) => {
     setYear(y);
     scrollToMap();
-    if (year !== 'Total') {
-      setActivity(filterAndSortRuns(activities, y, sortDateFunc));
-    } else {
-      setActivity(activities);
-    }
+    setActivity(filterAndSortRuns(activities, y, sortDateFunc));
     if (viewport.zoom > 3) {
       setViewport({
         width: '100%',

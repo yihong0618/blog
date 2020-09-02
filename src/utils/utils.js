@@ -140,7 +140,10 @@ const getBoundsForGeoData = (geoData, totalLength) => {
 
 const filterYearRuns = ((run, year) => run.start_date_local.slice(0, 4) === year);
 const filterAndSortRuns = (activities, year, sortFunc) => {
-  const s = activities.filter((run) => filterYearRuns(run, year));
+  let s = activities;
+  if (year !== 'Total') {
+     s = activities.filter((run) => filterYearRuns(run, year));
+  }
   return s.sort(sortFunc);
 };
 
