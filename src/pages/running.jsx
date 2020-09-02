@@ -2,18 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import MapboxLanguage from '@mapbox/mapbox-gl-language';
 import ReactMapGL, { Source, Layer } from 'react-map-gl';
-import { ViewportProvider, useDimensions } from 'react-viewport-utils';
 
 import Layout from '../components/layout';
 import { activities } from '../static/activities';
 import GitHubSvg from '../../assets/github.svg';
 import GridSvg from '../../assets/grid.svg';
 import {
-  titleForShow, formatPace, scrollToMap, locationForRun, intComma, geoJsonForRuns, geoJsonForMap, titleForRun, filterAndSortRuns, sortDateFunc, sortDateFuncReverse,
+  titleForShow, formatPace, scrollToMap, locationForRun, intComma, geoJsonForRuns, geoJsonForMap,
+  titleForRun, filterAndSortRuns, sortDateFunc, sortDateFuncReverse, getBoundsForGeoData,
 } from '../utils/utils';
-import {
-  MAPBOX_TOKEN, SHENYANG_YEARS_ARR, DALIAN_STRAT_POINT, SHENYANG_START_POINT,
-} from '../utils/const';
+import { MAPBOX_TOKEN } from '../utils/const';
 
 import styles from './running.module.scss';
 
@@ -31,7 +29,7 @@ let yearsArr = [];
       const location = locationForRun(run);
       const periodName = titleForRun(run);
       if (periodName) {
-        runPeriod[periodName] = (runPeriod[periodName] === undefined ? 1 : runPeriod[periodName] + 1);
+        runPeriod[periodName] = runPeriod[periodName] === undefined ? 1 : runPeriod[periodName] + 1;
       }
       locationsList.push(location);
       const { city, province, country } = location;
@@ -53,35 +51,34 @@ let yearsArr = [];
   provinces = [...new Set(provinces)];
   countries = [...new Set(countries)];
 })(activities);
+const totalActivitiesLength = activities.length;
 
+let thisYear = '';
+if (yearsArr) {
+  [thisYear] = yearsArr;
+}
 
 // Page
 export default () => {
-  const thisYear = yearsArr[0];
   const [year, setYear] = useState(thisYear);
-  let onStartPoint = SHENYANG_YEARS_ARR.includes(year)
-    ? SHENYANG_START_POINT
-    : DALIAN_STRAT_POINT;
   const [runs, setActivity] = useState(filterAndSortRuns(activities, year, sortDateFunc));
   const [title, setTitle] = useState('');
-  const [viewport, setViewport] = useState({
-    width: '100%',
-    height: 400,
-    latitude: onStartPoint[0],
-    longitude: onStartPoint[1],
-    zoom: 11.5,
-  });
   const [geoData, setGeoData] = useState(
     geoJsonForRuns(runs),
   );
-  const changeYear = (year) => {
-    setYear(year);
-    onStartPoint = SHENYANG_YEARS_ARR.includes(year)
-      ? SHENYANG_START_POINT
-      : DALIAN_STRAT_POINT;
+  // for auto zoom
+  const bounds = getBoundsForGeoData(geoData, totalActivitiesLength);
+
+  const [viewport, setViewport] = useState({
+    width: '100%',
+    height: 400,
+    ...bounds,
+  });
+  const changeYear = (y) => {
+    setYear(y);
     scrollToMap();
     if (year !== 'Total') {
-      setActivity(filterAndSortRuns(activities, year, sortDateFunc));
+      setActivity(filterAndSortRuns(activities, y, sortDateFunc));
     } else {
       setActivity(activities);
     }
@@ -89,12 +86,10 @@ export default () => {
       setViewport({
         width: '100%',
         height: 400,
-        latitude: onStartPoint[0],
-        longitude: onStartPoint[1],
-        zoom: 11.5,
+        ...bounds,
       });
     }
-    setTitle(`${year} Running Heatmap`);
+    setTitle(`${y} Running Heatmap`);
   };
 
   const locateActivity = (run) => {
@@ -103,32 +98,23 @@ export default () => {
   };
 
   useEffect(() => {
-    setGeoData(geoJsonForRuns(runs));
-  }, [year]);
-
-  useEffect(() => {
-    let startPoint;
-    const featuresLength = geoData.features.length;
-    const { coordinates } = geoData.features[featuresLength - 1].geometry;
-    const isSingleRun = featuresLength === 1;
-    if (coordinates.length === 0) {
-      startPoint = DALIAN_STRAT_POINT.reverse();
-    } else {
-      startPoint = coordinates[Math.floor(coordinates.length / 2)];
-    }
     setViewport({
       width: '100%',
       height: 400,
-      latitude: startPoint[1],
-      longitude: startPoint[0],
-      // if by year not single run
-      zoom: isSingleRun ? 14.5 : 11.5,
+      ...bounds,
     });
     scrollToMap();
   }, [geoData]);
 
+  useEffect(() => {
+    setGeoData(geoJsonForRuns(runs));
+  }, [year]);
+
   // TODO refactor
   useEffect(() => {
+    if (year !== 'Total') {
+      return;
+    }
     let rectArr = document.querySelectorAll('rect');
     if (rectArr.length !== 0) {
       rectArr = Array.from(rectArr).slice(1);
@@ -139,7 +125,8 @@ export default () => {
       // not run has no click event
       if (rectColor !== '#444444') {
         const runDate = rect.innerHTML;
-        const [runName] = runDate.match(/\d{4}-\d{1,2}-\d{1,2}/) || ['2021'];
+        // ingnore the error
+        const [runName] = runDate.match(/\d{4}-\d{1,2}-\d{1,2}/) || [];
         const runLocate = runs.filter(
           (r) => r.start_date_local.slice(0, 10) === runName,
         ).sort((a, b) => b.distance - a.distance)[0];
@@ -159,7 +146,8 @@ export default () => {
     polylineArr.forEach((polyline) => {
       // not run has no click event
       const runDate = polyline.innerHTML;
-      const [runName] = runDate.match(/\d{4}-\d{1,2}-\d{1,2}/) || ['2021'];
+      // `${+thisYear + 1}` ==> 2021
+      const [runName] = runDate.match(/\d{4}-\d{1,2}-\d{1,2}/) || [`${+thisYear + 1}`];
       const run = runs.filter(
         (r) => r.start_date_local.slice(0, 10) === runName,
       ).sort((a, b) => b.distance - a.distance)[0];
@@ -182,27 +170,15 @@ export default () => {
           </div>
           {viewport.zoom <= 3 ? <LocationStat runs={activities} location="a" onClick={changeYear} /> : <YearsStat runs={activities} year={year} onClick={changeYear} />}
           <div className="fl w-100 w-70-l">
-            {runs.length === 1 ? (
-              <RunMapWithViewport
-                runs={runs}
-                year={year}
-                title={title}
-                viewport={viewport}
-                geoData={geoData}
-                setViewport={setViewport}
-                changeYear={changeYear}
-              />
-            ) : (
-              <RunMapWithViewport
-                runs={runs}
-                year={year}
-                title={title}
-                viewport={viewport}
-                geoData={geoData}
-                setViewport={setViewport}
-                changeYear={changeYear}
-              />
-            )}
+            <RunMapWithViewport
+              runs={runs}
+              year={year}
+              title={title}
+              viewport={viewport}
+              geoData={geoData}
+              setViewport={setViewport}
+              changeYear={changeYear}
+            />
             {year === 'Total' ? <SVGStat />
               : (
                 <RunTable
@@ -256,7 +232,7 @@ const YearsStat = ({ runs, year, onClick }) => {
   );
 };
 
-const LocationStat = ({ runs, location, onClick }) => (
+const LocationStat = ({ runs, onClick }) => (
   <div className="fl w-100 w-30-l pb5 pr5-l">
     <section className="pb4" style={{ paddingBottom: '0rem' }}>
       <p>
@@ -371,13 +347,9 @@ const PeriodStat = () => {
   );
 };
 
-
-
 const RunMap = ({
-  runs, year, title, viewport, setViewport, changeYear, geoData,
+  title, viewport, setViewport, changeYear, geoData,
 }) => {
-  year = year || '2020';
-
   const [lastWidth, setLastWidth] = useState(0);
   const addControlHandler = (event) => {
     const map = event && event.target;
@@ -398,16 +370,6 @@ const RunMap = ({
   // for geojson format
   filterProvinces.unshift('in', 'name');
 
-  const dimensions = useDimensions({
-    deferUpdateUntilIdle: true,
-    disableScrollUpdates: true,
-  });
-  if (lastWidth !== dimensions.width) {
-    setTimeout(() => {
-      setViewport({ width: '100%', ...viewport });
-      setLastWidth(dimensions.width);
-    }, 0);
-  }
   const isBigMap = (viewport.zoom <= 3);
   if (isBigMap) {
     geoData = geoJsonForMap();
@@ -451,9 +413,7 @@ const RunMap = ({
 };
 
 const RunMapWithViewport = (props) => (
-  <ViewportProvider>
-    <RunMap {...props} />
-  </ViewportProvider>
+  <RunMap {...props} />
 );
 
 const RunMapButtons = ({ changeYear }) => {
@@ -474,7 +434,7 @@ const RunMapButtons = ({ changeYear }) => {
         {yearsButtons.map((year) => (
           <li
             key={`${year}button`}
-            style={{ color: year === '2020' ? 'rgb(224,237,94)' : 'white' }}
+            style={{ color: year === thisYear ? 'rgb(224,237,94)' : 'white' }}
             year={year}
             onClick={(e) => {
               changeYear(year);
@@ -497,7 +457,7 @@ const RunTable = ({
   const [sortFuncInfo, setSortFuncInfo] = useState('');
   if (!yearsArr.includes(year)) {
     // When total show 2020
-    year = '2020';
+    year = thisYear;
   }
   // TODO refactor?
   const sortKMFunc = (a, b) => (sortFuncInfo === 'KM' ? a.distance - b.distance : b.distance - a.distance);
