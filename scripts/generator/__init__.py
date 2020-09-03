@@ -93,9 +93,6 @@ class Generator:
                     streak = 1
                 activity.streak = streak
                 last_date = date
-                # Determine visited POIs.
-                # Append to result list.
-                # only run to show
                 activity_list.append(activity.to_dict())
 
         return athlete_dict, activity_list

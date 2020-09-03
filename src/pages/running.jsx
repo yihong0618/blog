@@ -451,10 +451,6 @@ const RunTable = ({
 }) => {
   const [runIndex, setRunIndex] = useState(-1);
   const [sortFuncInfo, setSortFuncInfo] = useState('');
-  if (!yearsArr.includes(year)) {
-    // When total show 2020
-    year = thisYear;
-  }
   // TODO refactor?
   const sortKMFunc = (a, b) => (sortFuncInfo === 'KM' ? a.distance - b.distance : b.distance - a.distance);
   const sortPaceFunc = (a, b) => (sortFuncInfo === 'Pace' ? a.average_speed - b.average_speed : b.average_speed - a.average_speed);
@@ -483,10 +479,9 @@ const RunTable = ({
         <thead>
           <tr>
             <th />
-            <th onClick={(e) => handleClick(e)}>KM</th>
-            <th onClick={(e) => handleClick(e)}>Pace</th>
-            <th onClick={(e) => handleClick(e)}>BPM</th>
-            <th onClick={(e) => handleClick(e)}>Date</th>
+            {Array.from(sortFuncMap.keys()).map((k) => (
+              <th onClick={(e) => handleClick(e)}>{k}</th>
+            ))}
           </tr>
         </thead>
         <tbody>
