@@ -166,7 +166,7 @@ export default () => {
           </div>
           {viewport.zoom <= 3 ? <LocationStat runs={activities} location="a" onClick={changeYear} /> : <YearsStat runs={activities} year={year} onClick={changeYear} />}
           <div className="fl w-100 w-70-l">
-            <RunMapWithViewport
+            <RunMap
               runs={runs}
               year={year}
               title={title}
@@ -407,10 +407,6 @@ const RunMap = ({
     </ReactMapGL>
   );
 };
-
-const RunMapWithViewport = (props) => (
-  <RunMap {...props} />
-);
 
 const RunMapButtons = ({ changeYear }) => {
   const yearsButtons = yearsArr.slice();
