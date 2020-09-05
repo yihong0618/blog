@@ -189,6 +189,7 @@ def upload_gpx(file_name):
 
 
 def make_new_gpxs(files):
+    # TODO refactor maybe we do not need to upload
     if not files:
         return
     if not os.path.exists(GPX_FOLDER):
