@@ -10,6 +10,7 @@ import json
 import os
 import s2sphere as s2
 from exceptions import TrackLoadError
+from utils import parse_datetime_to_local
 
 
 class Track:
@@ -34,6 +35,7 @@ class Track:
     def __init__(self):
         self.file_names = []
         self.polylines = []
+        self.use_local_time = False
         self.start_time = None
         self.end_time = None
         self.length = 0
@@ -76,6 +78,8 @@ class Track:
 
     def _load_gpx_data(self, gpx: "mod_gpxpy.gpx.GPX"):
         self.start_time, self.end_time = gpx.get_time_bounds()
+        if self.use_local_time:
+            self.start_time, self.end_time = parse_datetime_to_local(self.start_time, self.end_time, gpx)
         if self.start_time is None:
             raise TrackLoadError("Track has no start time.")
         if self.end_time is None:

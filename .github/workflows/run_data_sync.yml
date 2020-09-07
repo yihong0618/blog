@@ -60,8 +60,8 @@ jobs:
       - name: Make svg GitHub profile
         run: |
           source venv/bin/activate
-          python scripts/gpxtrackposter/cli.py  --language zh_CN --gpx-dir ./GPX_OUT --title "我的跑步记录" --type github --athlete "伊洪" --special-distance 10 --special-distance2 20 --special-color yellow --special-color2 red --output assets/github.svg
-          python scripts/gpxtrackposter/cli.py  --language zh_CN --gpx-dir ./GPX_OUT --title "Picked Over 10km Runs" --type grid --athlete "伊洪"  --output assets/grid.svg --min-distance 10.0 --special-color yellow --special-color2 red --special-distance 20 --special-distance2 40
+          python scripts/gpxtrackposter/cli.py  --language zh_CN --gpx-dir ./GPX_OUT --title "我的跑步记录" --type github --athlete "伊洪" --special-distance 10 --special-distance2 20 --special-color yellow --special-color2 red --output assets/github.svg --use-localtime
+          python scripts/gpxtrackposter/cli.py  --language zh_CN --gpx-dir ./GPX_OUT --title "Picked Over 10km Runs" --type grid --athlete "伊洪"  --output assets/grid.svg --min-distance 10.0 --special-color yellow --special-color2 red --special-distance 20 --special-distance2 40 --use-localtime
 
       - name: Push new runs
         uses: github-actions-x/commit@v2.6

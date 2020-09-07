@@ -7,9 +7,12 @@
 import colour
 import locale
 import math
+import pytz
+from datetime import datetime
 from typing import List, Optional, Tuple
 import s2sphere as s2
 from value_range import ValueRange
+from timezonefinder import TimezoneFinder
 from xy import XY
 
 
@@ -106,3 +109,15 @@ def interpolate_color(color1: str, color2: str, ratio: float) -> str:
 
 def format_float(f) -> str:
     return locale.format_string("%.1f", f)
+
+
+def parse_datetime_to_local(start_time: datetime,  end_time: datetime, gpx: "mod_gpxpy.gpx.GPX") -> Tuple[datetime, datetime]:
+    # just parse the start time, because start/end maybe different
+    offset = start_time.utcoffset()
+    if offset:
+        return start_time + offset, end_time + offset
+    tf = TimezoneFinder()
+    lat, _, lng, _ = list(gpx.get_bounds())
+    timezone = tf.timezone_at(lng=lng, lat=lat)
+    tc_offset = datetime.now(pytz.timezone(timezone)).utcoffset()
+    return start_time + tc_offset, end_time + tc_offset

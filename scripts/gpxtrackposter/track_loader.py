@@ -19,19 +19,21 @@ from year_range import YearRange
 log = logging.getLogger(__name__)
 
 
-def load_gpx_file(file_name: str) -> Track:
+def load_gpx_file(file_name: str, use_local_time: bool) -> Track:
     """Load an individual GPX file as a track by using Track.load_gpx()"""
     log.info(f"Loading track {os.path.basename(file_name)}...")
     t = Track()
+    t.use_local_time = use_local_time
     t.load_gpx(file_name)
     return t
 
 
-def load_cached_track_file(cache_file_name: str, file_name: str) -> Track:
+def load_cached_track_file(cache_file_name: str, file_name: str, use_local_time: bool) -> Track:
     """Load an individual track from cache files"""
     try:
         t = Track()
         t.load_cache(cache_file_name)
+        t.use_local_time = use_local_time
         t.file_names = [os.path.basename(file_name)]
         log.info(f"Loaded track {file_name} from cache file {cache_file_name}")
         return t
@@ -56,6 +58,7 @@ class TrackLoader:
     def __init__(self):
         self.min_length = 1000
         self.special_file_names = []
+        self.use_local_time = False
         self.year_range = YearRange()
         self.cache_dir = None
         self._cache_file_names = {}
@@ -80,7 +83,7 @@ class TrackLoader:
         cached_tracks = {}  # type: Dict[str, Track]
         if self.cache_dir:
             log.info(f"Trying to load {len(file_names)} track(s) from cache...")
-            cached_tracks = self._load_tracks_from_cache(file_names)
+            cached_tracks = self._load_tracks_from_cache(file_names, self.use_local_time)
             log.info(f"Loaded tracks from cache: {len(cached_tracks)}")
             tracks = list(cached_tracks.values())
 
@@ -90,7 +93,7 @@ class TrackLoader:
             log.info(
                 f"Trying to load {len(remaining_file_names)} track(s) from GPX files; this may take a while..."
             )
-            loaded_tracks = self._load_tracks(remaining_file_names)
+            loaded_tracks = self._load_tracks(remaining_file_names, self.use_local_time)
             tracks.extend(loaded_tracks.values())
             log.info(f"Conventionally loaded tracks: {len(loaded_tracks)}")
             self._store_tracks_to_cache(loaded_tracks)
@@ -139,11 +142,11 @@ class TrackLoader:
         return merged_tracks
 
     @staticmethod
-    def _load_tracks(file_names: List[str]) -> Dict[str, Track]:
+    def _load_tracks(file_names: List[str], use_local_time) -> Dict[str, Track]:
         tracks = {}
         with concurrent.futures.ProcessPoolExecutor() as executor:
             future_to_file_name = {
-                executor.submit(load_gpx_file, file_name): file_name
+                executor.submit(load_gpx_file, file_name, use_local_time): file_name
                 for file_name in file_names
             }
         for future in concurrent.futures.as_completed(future_to_file_name):
@@ -157,7 +160,7 @@ class TrackLoader:
 
         return tracks
 
-    def _load_tracks_from_cache(self, file_names: List[str]) -> Dict[str, Track]:
+    def _load_tracks_from_cache(self, file_names: List[str], use_local_time) -> Dict[str, Track]:
         tracks = {}
         with concurrent.futures.ProcessPoolExecutor() as executor:
             future_to_file_name = {
@@ -165,6 +168,7 @@ class TrackLoader:
                     load_cached_track_file,
                     self._get_cache_file_name(file_name),
                     file_name,
+                    use_local_time
                 ): file_name
                 for file_name in file_names
             }

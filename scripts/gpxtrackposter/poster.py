@@ -90,7 +90,6 @@ class Poster:
         for track in tracks:
             if not self.years.contains(track.start_time):
                 continue
-            track.start_time = track.start_time + self.tc_offset
             text_date = track.start_time.strftime("%Y-%m-%d")
             if text_date in self.tracks_by_date:
                 self.tracks_by_date[text_date].append(track)

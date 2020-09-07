@@ -231,6 +231,12 @@ def main():
         default=1.0,
         help="min distance by km for track filter",
     )
+    args_parser.add_argument(
+        "--use-localtime",
+        dest="use_localtime",
+        action="store_true",
+        help="Use utc time or local time",
+    )
 
     for _, drawer in drawers.items():
         drawer.create_args(args_parser)
@@ -247,6 +253,8 @@ def main():
         log.addHandler(handler)
 
     loader = track_loader.TrackLoader()
+    if args.use_localtime:
+        loader.use_local_time = True
     loader.cache_dir = os.path.join(
         appdirs.user_cache_dir(__app_name__, __app_author__), "tracks"
     )
