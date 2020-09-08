@@ -37,5 +37,5 @@ if __name__ == "__main__":
     parser.add_argument("refresh_token", help="strava refresh token")
     options = parser.parse_args()
     # maybe upload not done just tricky
-    time.sleep(15)
+    time.sleep(10)
     run(options.client_id, options.client_secret, options.refresh_token)
