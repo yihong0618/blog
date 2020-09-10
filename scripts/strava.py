@@ -206,7 +206,7 @@ def make_new_gpxs(files):
         if parsed_data:
             save_gpx(parsed_data, gpx_name)
     gpx_files = sorted(os.listdir(GPX_FOLDER))
-    # get new
+    # get new, TODO: not mind the delete stai
     gpx_files = gpx_files[-len(files):]
     for f in gpx_files:
         upload_gpx(GPX_FOLDER + "/" + f)

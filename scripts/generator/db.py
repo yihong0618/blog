@@ -141,9 +141,9 @@ class Activity(Base):
         return out
 
 
-def update_or_create_activity(session: Session, athlete: Athlete, strava_activity: StravaActivity) -> bool:
+def update_or_create_activity(session, athlete, strava_activity):
     created = False
-    activity: Optional[Activity] = session.query(Activity).filter_by(strava_id=strava_activity.id).first()
+    activity = session.query(Activity).filter_by(strava_id=int(strava_activity.id)).first()
     if not activity:
         start_point = strava_activity.start_latlng
         location_country = strava_activity.location_country
