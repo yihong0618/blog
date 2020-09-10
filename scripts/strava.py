@@ -214,6 +214,7 @@ def make_new_gpxs(files):
 
 
 if __name__ == "__main__":
+    # TODO try to support delete
     parser = argparse.ArgumentParser()
     parser.add_argument("client_id", help="strava client id")
     parser.add_argument("client_secret", help="strava client secret")
