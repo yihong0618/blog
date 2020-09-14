@@ -90,7 +90,7 @@ def generate_gpx(title, latitude_data, longitude_data, elevation_data, heart_rat
 
     for lat, lon in zip(latitude_data, longitude_data):
         if lat["start_epoch_ms"] != lon["start_epoch_ms"]:
-            error(f"\tThe latitude and longitude data is out of order")
+            raise Exception(f"\tThe latitude and longitude data is out of order")
 
         points_dict_list.append(
             {

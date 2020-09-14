@@ -381,7 +381,14 @@ const RunMap = ({
     >
       <RunMapButtons changeYear={changeYear} />
       <Source id="data" type="geojson" data={geoData}>
-
+        <Layer
+          id="prvince"
+          type="fill"
+          paint={{
+            'fill-color': '#47b8e0',
+          }}
+          filter={filterProvinces}
+        />
         <Layer
           id="runs2"
           type="line"
@@ -393,14 +400,6 @@ const RunMap = ({
             'line-join': 'round',
             'line-cap': 'round',
           }}
-        />
-        <Layer
-          id="prvince"
-          type="fill"
-          paint={{
-            'fill-color': '#47b8e0',
-          }}
-          filter={filterProvinces}
         />
       </Source>
       <span className={styles.runTitle}>{title}</span>
@@ -417,7 +416,9 @@ const RunMapButtons = ({ changeYear }) => {
     e.target.style.color = 'rgb(224,237,94)';
 
     const elements = document.getElementsByClassName(styles.button);
-    elements[index].style.color = 'white';
+    if (index !== elementIndex) {
+      elements[index].style.color = 'white';
+    };
     setIndex(elementIndex);
   };
   return (
@@ -443,7 +444,7 @@ const RunMapButtons = ({ changeYear }) => {
 };
 
 const RunTable = ({
-  runs, year, locateActivity, setActivity,
+  runs, year, locateActivity, setActivity
 }) => {
   const [runIndex, setRunIndex] = useState(-1);
   const [sortFuncInfo, setSortFuncInfo] = useState('');
@@ -466,6 +467,10 @@ const RunTable = ({
       setSortFuncInfo(funcName);
     }
     const f = sortFuncMap.get(e.target.innerHTML);
+    if (runIndex !== -1) {
+      const el = document.getElementsByClassName(styles.runRow);
+      el[runIndex].style.color = 'rgb(224,237,94)';
+    }
     setActivity(filterAndSortRuns(runs, year, f));
   };
 
@@ -513,7 +518,7 @@ const RunRow = ({
     e.target.parentElement.style.color = 'red';
 
     const elements = document.getElementsByClassName(styles.runRow);
-    if (runIndex !== -1) {
+    if (runIndex !== -1 && elementIndex !== runIndex) {
       elements[runIndex].style.color = 'rgb(224,237,94)';
     }
     setRunIndex(elementIndex);
