@@ -210,7 +210,7 @@ const YearsStat = ({ runs, year, onClick }) => {
     <div className="fl w-100 w-30-l pb5 pr5-l">
       <section className="pb4" style={{ paddingBottom: '0rem' }}>
         <p>
-          我用 App 记录自己跑步8年有余，下面列表展示的是
+          我用 App 记录自己跑步{yearsArr.length-1}年有余，下面列表展示的是
           {year}
           的数据
           <br />

@@ -30,6 +30,7 @@ const scrollToMap = () => {
   window.scroll(rect.left + window.scrollX, rect.top + window.scrollY);
 };
 
+// what about oversea?
 const locationForRun = (run) => {
   const location = run.location_country;
   let [city, province, country] = ['', '', ''];

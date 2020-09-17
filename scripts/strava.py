@@ -210,6 +210,7 @@ def make_new_gpxs(files):
     gpx_files = gpx_files[-len(files):]
     for f in gpx_files:
         upload_gpx(GPX_FOLDER + "/" + f)
+        upload_gpx(os.path.join(GPX_FOLDER, f))
         logger.info(f +" uploaded")
 
 
