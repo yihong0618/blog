@@ -1,3 +1,9 @@
+# Using Gatsby
+
+# install
+- yarn install
+- yarn develop
+
 # https://yihong.run
 
 ## projects
