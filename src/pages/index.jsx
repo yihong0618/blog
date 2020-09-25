@@ -76,6 +76,19 @@ export default ({ data }) => {
             </div>
           </div>
         </div>
+      <div className="fl w-100 w-30-l pb5 pr5-l">
+          <h1>Links:</h1>
+            <div className="fl w-100 w-70-l">
+                <h3>
+                  <a
+                    href="https://kenlai.me/"
+                    className="link blue no-underline"
+                  >
+                    kenlai: 网络前辈
+                  </a>
+                </h3>
+            </div>
+        </div>
       </Layout>
     </Fragment>
   );
