@@ -28087,23 +28087,6 @@ const activities = [
     "average_heartrate": 150.5,
     "average_speed": 3.036,
     "streak": 135
-  },
-  {
-    "strava_id": 4114023892,
-    "athlete_id": 58330365,
-    "name": "\u508d\u665a\u8dd1\u6b65",
-    "distance": 5599.3,
-    "moving_time": "0:30:44",
-    "elapsed_time": "0:34:01",
-    "total_elevation_gain": 67.3,
-    "type": "Run",
-    "start_date": "2020-09-26 11:10:22+00:00",
-    "start_date_local": "2020-09-26 19:10:22",
-    "location_country": "\u5e7f\u8d24\u8def, \u51cc\u6c34\u8857\u9053, \u7518\u4e95\u5b50\u533a, \u5927\u8fde\u5e02, \u8fbd\u5b81\u7701, 116085, China \u4e2d\u56fd",
-    "summary_polyline": "qielF{htdVPJv@n@`@Tp@p@f@ZLPb@XNPz@f@NNRH`@Zd@TNN`@Tr@n@RJfBJRCT@PGRHrAHh@CPKT?RBVEPJh@?RKPTHVBZAXBrAA^@ZEpAFnACpA@\\GXFVDp@EjB?`CEXDx@?XNbAO~B?jBCnA@Z@lBCnAJr@CVFXRLxAExAQhBOT?tAS~@G|Au@f@OlAi@z@YRELOPIPCb@Mz@_@R@TEh@Oh@GPER@h@ErA@P@TFVBnABPBRHVDfCv@f@Z^Zf@R`@`@f@^TH^ZTHPLx@^f@\\NDNLb@PnBpA`@Nb@XTDz@^d@\\z@`@TBhAw@NOPMTIP@h@MRARDPA\\Y`@e@FYLUd@}Af@u@HYLQVm@Zi@Lm@Rg@Xg@Pq@TmAPeB@u@ImAOs@CWQs@_AiBKYq@y@]k@OQMq@Uq@Yk@e@wAg@cA]a@g@{@OKMQMSIWSS[a@OOg@[QOQASGqB}@OKy@WSQSIi@USAiAg@QEMMe@[sB{@MQqB}@c@]k@w@{@_@u@i@SIa@[c@YQOUKa@_@QIOMOQcAg@UEQKUEe@e@e@[{@gAGWa@gAGYMYUkASq@EWSm@k@{BKWQo@i@cAQMQk@OMm@q@EUQAQGuAiAw@c@e@g@SEe@_@SGSMa@a@iAw@c@]QSSEOQi@[]]e@W",
-    "average_heartrate": 150.5,
-    "average_speed": 3.036,
-    "streak": 135
   }
 ];
 
