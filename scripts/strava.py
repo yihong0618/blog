@@ -233,5 +233,6 @@ if __name__ == "__main__":
         )
     last_time = get_last_time(client)
     # change here to manual
+    time.sleep(5)
     files = get_to_generate_files(last_time)
     make_new_gpxs(files)
