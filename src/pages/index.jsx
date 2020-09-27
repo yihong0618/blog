@@ -87,6 +87,14 @@ export default ({ data }) => {
                     kenlai: 网络前辈
                   </a>
                 </h3>
+                <h3>
+                  <a
+                    href="https://blog.duanfei.org/"
+                    className="link blue no-underline"
+                  >
+                    友人A: 跑步的朋友
+                  </a>
+                </h3>
             </div>
         </div>
       </Layout>
