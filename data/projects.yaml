@@ -63,6 +63,14 @@
   languages:
     - Python
 
+- name: GpxTrackPoster
+  role: contributor
+  primary: true
+  description: Create a visually appealing poster from your GPX tracks
+  repo: flopp/GpxTrackPoster
+  languages:
+    - Python
+
 - name: blog
   role: author
   primary: false
