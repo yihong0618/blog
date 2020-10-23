@@ -1,3 +1,13 @@
+- name: running_page
+  role: author
+  status: legacy
+  primary: true
+  description: Build your own running_page
+  repo: yihong0618/running_page
+  languages:
+    - Python
+    - JavaScrip
+
 - name: gaycore
   role: author
   status: legacy
@@ -92,3 +102,11 @@
   repo: flopp/activities
   languages:
     - JavaScript
+
+- name: kb
+  role: contributor
+  primary: false
+  description: A minimalist command line knowledge base manager
+  repo: gnebbia/kb 
+  languages:
+    - Python
