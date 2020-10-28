@@ -95,6 +95,14 @@ export default ({ data }) => {
                     友人A: 跑步的朋友
                   </a>
                 </h3>
+                <h3>
+                  <a
+                    href="https://tuzi.moe/"
+                    className="link blue no-underline"
+                  >
+                    兔子鮮笙: 19 岁的天才少年
+                  </a>
+                </h3>
             </div>
         </div>
       </Layout>
