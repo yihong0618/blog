@@ -112,7 +112,8 @@ export default () => {
     }
     const tempGeoData = geoJsonForRuns(runs);
     const runNum = tempGeoData.features.length;
-    const sliceNume = runNum / 20;
+    // maybe change 20 ?
+    const sliceNume = runNum >= 20 ? runNum / 20 : 1;
     let i = sliceNume;
     let id = setInterval(() => {
       if (i >= runNum) {
