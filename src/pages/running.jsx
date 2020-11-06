@@ -64,10 +64,12 @@ export default () => {
   const [runs, setActivity] = useState(filterAndSortRuns(activities, year, sortDateFunc));
   const [title, setTitle] = useState('');
   const [geoData, setGeoData] = useState(
-    geoJsonForRuns(runs),
+    geoJsonForRuns(runs)
   );
+
   // for auto zoom
   const bounds = getBoundsForGeoData(geoData, totalActivitiesLength);
+  const [intervalId, setIntervalId] = useState();
 
   const [viewport, setViewport] = useState({
     width: '100%',
@@ -86,6 +88,7 @@ export default () => {
       });
     }
     setTitle(`${y} Running Heatmap`);
+    clearInterval(intervalId)
   };
 
   const locateActivity = (run) => {
@@ -103,7 +106,25 @@ export default () => {
   }, [geoData]);
 
   useEffect(() => {
-    setGeoData(geoJsonForRuns(runs));
+    
+    if (year !== 'Total') {
+      runs.sort(sortDateFuncReverse)
+    }
+    const tempGeoData = geoJsonForRuns(runs);
+    const runNum = tempGeoData.features.length;
+    const sliceNume = runNum / 20;
+    let i = sliceNume;
+    let id = setInterval(() => {
+      if (i >= runNum) {
+        clearInterval(id)
+      }
+      const f = JSON.parse(JSON.stringify(tempGeoData));
+      const tempFeatures = tempGeoData.features.slice(0, i)
+      f.features = tempFeatures
+      setGeoData(f)
+      i = i + sliceNume;
+    }, 100);
+    setIntervalId(id);
   }, [year]);
 
   // TODO refactor
@@ -346,7 +367,6 @@ const PeriodStat = () => {
 const RunMap = ({
   title, viewport, setViewport, changeYear, geoData,
 }) => {
-  const [lastWidth, setLastWidth] = useState(0);
   const addControlHandler = (event) => {
     const map = event && event.target;
     // set lauguage to Chinese if you use English please comment it
