@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import MapboxLanguage from '@mapbox/mapbox-gl-language';
-import ReactMapGL, { Source, Layer } from 'react-map-gl';
+import ReactMapGL, { Source, Layer, Marker } from 'react-map-gl';
 
 import Layout from '../components/layout';
 import { activities } from '../static/activities';
 import GitHubSvg from '../../assets/github.svg';
 import GridSvg from '../../assets/grid.svg';
+import StartSvg from '../../assets/start.svg';
+import EndSvg from '../../assets/end.svg';
 import {
   titleForShow, formatPace, scrollToMap, locationForRun, intComma, geoJsonForRuns, geoJsonForMap,
   titleForRun, filterAndSortRuns, sortDateFunc, sortDateFuncReverse, getBoundsForGeoData,
@@ -64,7 +66,7 @@ export default () => {
   const [runs, setActivity] = useState(filterAndSortRuns(activities, year, sortDateFunc));
   const [title, setTitle] = useState('');
   const [geoData, setGeoData] = useState(
-    geoJsonForRuns(runs)
+    geoJsonForRuns(runs),
   );
 
   // for auto zoom
@@ -88,12 +90,13 @@ export default () => {
       });
     }
     setTitle(`${y} Running Heatmap`);
-    clearInterval(intervalId)
+    clearInterval(intervalId);
   };
 
   const locateActivity = (run) => {
     setGeoData(geoJsonForRuns([run]));
     setTitle(titleForShow(run));
+    clearInterval(intervalId);
   };
 
   useEffect(() => {
@@ -106,24 +109,24 @@ export default () => {
   }, [geoData]);
 
   useEffect(() => {
-    
     if (year !== 'Total') {
-      runs.sort(sortDateFuncReverse)
+      runs.sort(sortDateFuncReverse);
     }
     const tempGeoData = geoJsonForRuns(runs);
     const runNum = tempGeoData.features.length;
     // maybe change 20 ?
     const sliceNume = runNum >= 20 ? runNum / 20 : 1;
     let i = sliceNume;
-    let id = setInterval(() => {
+    const id = setInterval(() => {
       if (i >= runNum) {
-        clearInterval(id)
+        clearInterval(id);
       }
+      // deep copy
       const f = JSON.parse(JSON.stringify(tempGeoData));
-      const tempFeatures = tempGeoData.features.slice(0, i)
-      f.features = tempFeatures
-      setGeoData(f)
-      i = i + sliceNume;
+      const tempFeatures = tempGeoData.features.slice(0, i);
+      f.features = tempFeatures;
+      setGeoData(f);
+      i += sliceNume;
     }, 100);
     setIntervalId(id);
   }, [year]);
@@ -232,7 +235,9 @@ const YearsStat = ({ runs, year, onClick }) => {
     <div className="fl w-100 w-30-l pb5 pr5-l">
       <section className="pb4" style={{ paddingBottom: '0rem' }}>
         <p>
-          我用 App 记录自己跑步{yearsArr.length-1}年有余，下面列表展示的是
+          我用 App 记录自己跑步
+          {yearsArr.length - 1}
+          年有余，下面列表展示的是
           {year}
           的数据
           <br />
@@ -391,6 +396,16 @@ const RunMap = ({
   if (isBigMap) {
     geoData = geoJsonForMap();
   }
+  const isSingleRun = geoData.features.length === 1;
+  let startLon; let
+    startLat;
+  let endLon; let
+    endLat;
+  if (isSingleRun) {
+    const points = geoData.features[0].geometry.coordinates;
+    [startLon, startLat] = points[0];
+    [endLon, endLat] = points[points.length-1];
+  }
 
   return (
     <ReactMapGL
@@ -423,8 +438,30 @@ const RunMap = ({
           }}
         />
       </Source>
+      {isSingleRun
+      && <RunMarker startLat={startLat} startLon={startLon} endLat={endLat} endLon={endLon} /> }
       <span className={styles.runTitle}>{title}</span>
     </ReactMapGL>
+  );
+};
+
+const RunMarker = ({
+  startLon, startLat, endLon, endLat 
+}) => {
+  const size = 20;
+  return (
+    <div>
+      <Marker key="maker" longitude={startLon} latitude={startLat}>
+        <div style={{ transform: `translate(${-size / 2}px,${-size}px)` }}>
+          <StartSvg className={styles.locationSVG} />
+        </div>
+      </Marker>
+      <Marker key="maker" longitude={endLon} latitude={endLat}>
+        <div style={{ transform: `translate(${-size / 2}px,${-size}px)` }}>
+          <EndSvg className={styles.locationSVG} />
+        </div>
+      </Marker>
+    </div>
   );
 };
 
@@ -439,7 +476,7 @@ const RunMapButtons = ({ changeYear }) => {
     const elements = document.getElementsByClassName(styles.button);
     if (index !== elementIndex) {
       elements[index].style.color = 'white';
-    };
+    }
     setIndex(elementIndex);
   };
   return (
@@ -465,7 +502,7 @@ const RunMapButtons = ({ changeYear }) => {
 };
 
 const RunTable = ({
-  runs, year, locateActivity, setActivity
+  runs, year, locateActivity, setActivity,
 }) => {
   const [runIndex, setRunIndex] = useState(-1);
   const [sortFuncInfo, setSortFuncInfo] = useState('');
