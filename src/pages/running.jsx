@@ -97,6 +97,7 @@ export default () => {
     setGeoData(geoJsonForRuns([run]));
     setTitle(titleForShow(run));
     clearInterval(intervalId);
+    scrollToMap();
   };
 
   useEffect(() => {
@@ -105,7 +106,6 @@ export default () => {
       height: 400,
       ...bounds,
     });
-    scrollToMap();
   }, [geoData]);
 
   useEffect(() => {
