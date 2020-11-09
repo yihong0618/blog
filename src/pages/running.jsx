@@ -109,9 +109,6 @@ export default () => {
   }, [geoData]);
 
   useEffect(() => {
-    if (year !== 'Total') {
-      runs.sort(sortDateFuncReverse);
-    }
     const tempGeoData = geoJsonForRuns(runs);
     const runNum = tempGeoData.features.length;
     // maybe change 20 ?
@@ -404,7 +401,7 @@ const RunMap = ({
   if (isSingleRun) {
     const points = geoData.features[0].geometry.coordinates;
     [startLon, startLat] = points[0];
-    [endLon, endLat] = points[points.length-1];
+    [endLon, endLat] = points[points.length - 1];
   }
 
   return (
@@ -446,7 +443,7 @@ const RunMap = ({
 };
 
 const RunMarker = ({
-  startLon, startLat, endLon, endLat 
+  startLon, startLat, endLon, endLat,
 }) => {
   const size = 20;
   return (
