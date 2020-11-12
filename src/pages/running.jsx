@@ -65,11 +65,12 @@ if (yearsArr) {
 // Hooks
 const useHover = () => {
   const [hovered, setHovered] = useState();
+  const [timer, setTimer] = useState();
   
-  const eventHandlers = useMemo(() => ({
-    onMouseOver() {setHovered(true); },
-    onMouseOut() { setHovered(false); }
-  }), []);
+  const eventHandlers = {
+    onMouseOver() {setTimer(setTimeout(()=>setHovered(true), 1500)); },
+    onMouseOut() { clearTimeout(timer);setHovered(false); }
+  };
   
   return [hovered, eventHandlers];
 }
