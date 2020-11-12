@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
 import MapboxLanguage from '@mapbox/mapbox-gl-language';
 import ReactMapGL, { Source, Layer, Marker } from 'react-map-gl';
@@ -9,6 +9,7 @@ import GitHubSvg from '../../assets/github.svg';
 import GridSvg from '../../assets/grid.svg';
 import StartSvg from '../../assets/start.svg';
 import EndSvg from '../../assets/end.svg';
+// import Year2020Svg from '../../assets/year_2020.svg';
 import {
   titleForShow, formatPace, scrollToMap, locationForRun, intComma, geoJsonForRuns, geoJsonForMap,
   titleForRun, filterAndSortRuns, sortDateFunc, sortDateFuncReverse, getBoundsForGeoData,
@@ -17,13 +18,14 @@ import { MAPBOX_TOKEN } from '../utils/const';
 
 import styles from './running.module.scss';
 
+
+// generate base attr
 const cities = {};
 const runPeriod = {};
 let provinces = [];
 let countries = [];
 let yearsArr = [];
 
-// generate base attr
 ((runs) => {
   const locationsList = [];
   runs.forEach(
@@ -58,6 +60,18 @@ const totalActivitiesLength = activities.length;
 let thisYear = '';
 if (yearsArr) {
   [thisYear] = yearsArr;
+}
+
+// Hooks
+const useHover = () => {
+  const [hovered, setHovered] = useState();
+  
+  const eventHandlers = useMemo(() => ({
+    onMouseOver() {setHovered(true); },
+    onMouseOut() { setHovered(false); }
+  }), []);
+  
+  return [hovered, eventHandlers];
 }
 
 // Page
@@ -109,20 +123,16 @@ export default () => {
   }, [geoData]);
 
   useEffect(() => {
-    const tempGeoData = geoJsonForRuns(runs);
-    const runNum = tempGeoData.features.length;
+    const runsNum = runs.length;
     // maybe change 20 ?
-    const sliceNume = runNum >= 20 ? runNum / 20 : 1;
+    const sliceNume = runsNum >= 20 ? runsNum / 20 : 1;
     let i = sliceNume;
     const id = setInterval(() => {
-      if (i >= runNum) {
+      if (i >= runsNum) {
         clearInterval(id);
       }
-      // deep copy
-      const f = JSON.parse(JSON.stringify(tempGeoData));
-      const tempFeatures = tempGeoData.features.slice(0, i);
-      f.features = tempFeatures;
-      setGeoData(f);
+      const tempRuns = runs.slice(0, i);
+      setGeoData(geoJsonForRuns(tempRuns));
       i += sliceNume;
     }, 100);
     setIntervalId(id);
@@ -184,9 +194,9 @@ export default () => {
       <Layout>
         <div className="mb5">
           <div className="w-100">
-            <h1 className="f1 fw9 i">Running</h1>
+          <h1 className="f1 fw9 i">Running</h1>
           </div>
-          {viewport.zoom <= 3 ? <LocationStat runs={activities} location="a" onClick={changeYear} /> : <YearsStat runs={activities} year={year} onClick={changeYear} />}
+      {viewport.zoom <= 3 ? <LocationStat runs={activities} location="a" onClick={changeYear} /> : <YearsStat runs={activities} year={year} onClick={changeYear} />}
           <div className="fl w-100 w-70-l">
             <RunMap
               runs={runs}
@@ -273,6 +283,15 @@ const LocationStat = ({ runs, onClick }) => (
 );
 
 const YearStat = ({ runs, year, onClick }) => {
+
+  // for hover
+  const [hovered, eventHandlers] = useHover();
+  // lazy Component
+  const YearSvg = React.lazy(() =>
+    import(`../../assets/year_${year}.svg`)
+    .catch(() => ({ default: () => <div></div> }))
+  );
+
   if (yearsArr.includes(year)) {
     runs = runs.filter((run) => run.start_date_local.slice(0, 4) === year);
   }
@@ -305,7 +324,7 @@ const YearStat = ({ runs, year, onClick }) => {
     0,
   );
   return (
-    <div style={{ cursor: 'pointer' }} onClick={() => onClick(year)}>
+    <div style={{ cursor: 'pointer' }} onClick={() => onClick(year)} {...eventHandlers}>
       <section>
         <Stat value={year} description=" 跑步旅程" />
         <Stat value={runs.length} description=" Runs" />
@@ -320,6 +339,7 @@ const YearStat = ({ runs, year, onClick }) => {
           <Stat value={avgHeartRate} description=" Avg Heart Rate" />
         )}
       </section>
+      {hovered && <React.Suspense fallback={'loading...'}><YearSvg className={styles.yearSVG} /></React.Suspense>}
       <hr color="red" />
     </div>
   );
@@ -393,7 +413,7 @@ const RunMap = ({
   if (isBigMap) {
     geoData = geoJsonForMap();
   }
-  const isSingleRun = geoData.features.length === 1;
+  const isSingleRun = geoData.features.length === 1 && geoData.features[0].geometry.coordinates.length;
   let startLon; let
     startLat;
   let endLon; let
@@ -448,12 +468,12 @@ const RunMarker = ({
   const size = 20;
   return (
     <div>
-      <Marker key="maker" longitude={startLon} latitude={startLat}>
+      <Marker key="maker_start" longitude={startLon} latitude={startLat}>
         <div style={{ transform: `translate(${-size / 2}px,${-size}px)` }}>
           <StartSvg className={styles.locationSVG} />
         </div>
       </Marker>
-      <Marker key="maker" longitude={endLon} latitude={endLat}>
+      <Marker key="maker_end" longitude={endLon} latitude={endLat}>
         <div style={{ transform: `translate(${-size / 2}px,${-size}px)` }}>
           <EndSvg className={styles.locationSVG} />
         </div>

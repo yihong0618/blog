@@ -56,6 +56,7 @@ class Poster:
         self.tracks_drawer = None
         self.trans = None
         self.set_language(None)
+        self.drawer_type = None
         self.tc_offset = datetime.now(pytz.timezone('Asia/Shanghai')).utcoffset()
 
     def set_language(self, language):
@@ -103,12 +104,17 @@ class Poster:
     def draw(self, drawer, output):
         """Set the Poster's drawer and draw the tracks."""
         self.tracks_drawer = drawer
+        if self.drawer_type == "plain":
+            self.height = self.height - 60
         d = svgwrite.Drawing(output, (f"{self.width}mm", f"{self.height}mm"))
         d.viewbox(0, 0, self.width, self.height)
         d.add(d.rect((0, 0), (self.width, self.height), fill=self.colors["background"]))
-        self.__draw_header(d)
-        self.__draw_footer(d)
-        self.__draw_tracks(d, XY(self.width - 20, self.height - 30 - 30), XY(10, 30))
+        if not self.drawer_type == "plain":
+            self.__draw_header(d)
+            self.__draw_footer(d)
+            self.__draw_tracks(d, XY(self.width - 20, self.height - 30 - 30), XY(10, 30))
+        else:
+            self.__draw_tracks(d, XY(self.width - 20, self.height), XY(10, 0))
         d.save()
 
     def m2u(self, m):

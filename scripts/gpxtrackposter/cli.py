@@ -298,6 +298,8 @@ def main():
     }
     p.units = args.units
     p.set_tracks(tracks)
+    # circular not add footer and header
+    p.drawer_type = "plain" if args.type == "circular" else "title"
     if args.type == "github":
         p.height = 55 + p.years.count() * 43
     p.draw(drawers[args.type], args.output)
