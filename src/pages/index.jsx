@@ -103,6 +103,14 @@ export default ({ data }) => {
                     兔子鮮笙: 19 岁的天才少年
                   </a>
                 </h3>
+                <h3>
+                  <a
+                    href="https://frostming.com/"
+                    className="link blue no-underline"
+                  >
+                    Frost Ming: 醉后不知天在水，满船清梦压星河
+                  </a>
+                </h3>
             </div>
         </div>
       </Layout>
