@@ -1,7 +1,9 @@
-import React from "react";
+import React, { Fragment } from "react";
+import { Helmet } from "react-helmet";
 import { Link, graphql } from "gatsby";
 
 import Layout from "../components/layout";
+import styles from "./running.module.scss";
 
 const PostItem = ({ post }) => {
   return (
@@ -20,6 +22,8 @@ const PostItem = ({ post }) => {
 
 export default ({ data }) => {
   return (
+    <Fragment>
+      <Helmet bodyAttributes={{ class: styles.body }} />
     <Layout>
       <div>
         <div className="fl w-100 w-70-l">
@@ -29,6 +33,7 @@ export default ({ data }) => {
         </div>
       </div>
     </Layout>
+    </Fragment>
   );
 };
 

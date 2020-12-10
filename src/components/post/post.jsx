@@ -32,6 +32,7 @@ export default ({ data }) => {
         ]}
       />
       <Layout>
+        {/* <article className={styles.post}> */}
         <article className={styles.post}>
           <header>
             <h1 className="f2-m mb1 f1-l measure-narrow">
