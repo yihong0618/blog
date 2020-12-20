@@ -111,6 +111,14 @@ export default ({ data }) => {
                     Frost Ming: 醉后不知天在水，满船清梦压星河
                   </a>
                 </h3>
+                <h3>
+                  <a
+                    href="https://changchen.me/"
+                    className="link blue no-underline"
+                  >
+                    daya0576: 喜欢 python 的大牙
+                  </a>
+                </h3>
             </div>
         </div>
       </Layout>
