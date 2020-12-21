@@ -56,7 +56,12 @@ const locationForRun = (run) => {
   return { country, province, city };
 };
 
-const intComma = (x) => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+const intComma = (x) => {
+  if (x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+  return '';
+};
 
 const pathForRun = (run) => {
   try {
@@ -139,11 +144,25 @@ const getBoundsForGeoData = (geoData, totalLength) => {
   return { longitude, latitude, zoom };
 };
 
-const filterYearRuns = ((run, year) => run.start_date_local.slice(0, 4) === year);
-const filterAndSortRuns = (activities, year, sortFunc) => {
+const filterYearRuns = ((run, year) => {
+  if (run && run.start_date_local) {
+    return run.start_date_local.slice(0, 4) === year;
+  }
+  return false;
+});
+
+const filterCityRuns = ((run, city) => {
+  if (run && run.location_country) {
+    return run.location_country.includes(city);
+  }
+  return false;
+});
+const filterTitleRuns = ((run, title) => titleForRun(run) === title);
+
+const filterAndSortRuns = (activities, item, filterFunc, sortFunc) => {
   let s = activities;
-  if (year !== 'Total') {
-     s = activities.filter((run) => filterYearRuns(run, year));
+  if (item !== 'Total') {
+    s = activities.filter((run) => filterFunc(run, item));
   }
   return s.sort(sortFunc);
 };
@@ -152,5 +171,5 @@ const sortDateFunc = (a, b) => new Date(b.start_date_local.replace(' ', 'T')) - 
 const sortDateFuncReverse = (a, b) => new Date(a.start_date_local.replace(' ', 'T')) - new Date(b.start_date_local.replace(' ', 'T'));
 
 export {
-  titleForShow, formatPace, scrollToMap, locationForRun, intComma, pathForRun, geoJsonForRuns, geoJsonForMap, titleForRun, filterYearRuns, filterAndSortRuns, sortDateFunc, sortDateFuncReverse, getBoundsForGeoData,
+  titleForShow, formatPace, scrollToMap, locationForRun, intComma, pathForRun, geoJsonForRuns, geoJsonForMap, titleForRun, filterYearRuns, filterCityRuns, filterTitleRuns, filterAndSortRuns, sortDateFunc, sortDateFuncReverse, getBoundsForGeoData,
 };

@@ -12,12 +12,11 @@ import EndSvg from '../../assets/end.svg';
 // import Year2020Svg from '../../assets/year_2020.svg';
 import {
   titleForShow, formatPace, scrollToMap, locationForRun, intComma, geoJsonForRuns, geoJsonForMap,
-  titleForRun, filterAndSortRuns, sortDateFunc, sortDateFuncReverse, getBoundsForGeoData,
+  titleForRun, filterYearRuns, filterCityRuns, filterTitleRuns, filterAndSortRuns, sortDateFunc, sortDateFuncReverse, getBoundsForGeoData,
 } from '../utils/utils';
 import { MAPBOX_TOKEN } from '../utils/const';
 
 import styles from './running.module.scss';
-
 
 // generate base attr
 const cities = {};
@@ -66,19 +65,20 @@ if (yearsArr) {
 const useHover = () => {
   const [hovered, setHovered] = useState();
   const [timer, setTimer] = useState();
-  
+
   const eventHandlers = {
-    onMouseOver() {setTimer(setTimeout(()=>setHovered(true), 700)); },
-    onMouseOut() { clearTimeout(timer);setHovered(false); }
+    onMouseOver() { setTimer(setTimeout(() => setHovered(true), 700)); },
+    onMouseOut() { clearTimeout(timer); setHovered(false); },
   };
-  
+
   return [hovered, eventHandlers];
-}
+};
 
 // Page
 export default () => {
   const [year, setYear] = useState(thisYear);
-  const [runs, setActivity] = useState(filterAndSortRuns(activities, year, sortDateFunc));
+  const [runIndex, setRunIndex] = useState(-1);
+  const [runs, setActivity] = useState(filterAndSortRuns(activities, year, filterYearRuns, sortDateFunc));
   const [title, setTitle] = useState('');
   const [geoData, setGeoData] = useState(
     geoJsonForRuns(runs),
@@ -93,10 +93,17 @@ export default () => {
     height: 400,
     ...bounds,
   });
-  const changeYear = (y) => {
-    setYear(y);
+
+  const changeByItem = (item, name, func) => {
     scrollToMap();
-    setActivity(filterAndSortRuns(activities, y, sortDateFunc));
+    setActivity(filterAndSortRuns(activities, item, func, sortDateFunc));
+    setTitle(`${item} ${name} Running Heatmap`);
+    setRunIndex(-1);
+  };
+
+  const changeYear = (y) => {
+    // default year
+    setYear(y);
     if (viewport.zoom > 3) {
       setViewport({
         width: '100%',
@@ -104,8 +111,16 @@ export default () => {
         ...bounds,
       });
     }
-    setTitle(`${y} Running Heatmap`);
+    changeByItem(y, 'Year', filterYearRuns);
     clearInterval(intervalId);
+  };
+
+  const changeCity = (city) => {
+    changeByItem(city, 'City', filterCityRuns);
+  };
+
+  const changeTitle = (title) => {
+    changeByItem(title, 'Title', filterTitleRuns);
   };
 
   const locateActivity = (run) => {
@@ -195,9 +210,9 @@ export default () => {
       <Layout>
         <div className="mb5">
           <div className="w-100">
-          <h1 className="f1 fw9 i">Running</h1>
+            <h1 className="f1 fw9 i">Running</h1>
           </div>
-      {viewport.zoom <= 3 ? <LocationStat runs={activities} location="a" onClick={changeYear} /> : <YearsStat runs={activities} year={year} onClick={changeYear} />}
+          {viewport.zoom <= 3 ? <LocationStat runs={activities} location="a" changeYear={changeYear} changeCity={changeCity} changeTitle={changeTitle} /> : <YearsStat runs={activities} year={year} onClick={changeYear} />}
           <div className="fl w-100 w-70-l">
             <RunMap
               runs={runs}
@@ -215,6 +230,8 @@ export default () => {
                   year={year}
                   locateActivity={locateActivity}
                   setActivity={setActivity}
+                  runIndex={runIndex}
+                  setRunIndex={setRunIndex}
                 />
               )}
           </div>
@@ -263,7 +280,9 @@ const YearsStat = ({ runs, year, onClick }) => {
   );
 };
 
-const LocationStat = ({ runs, onClick }) => (
+const LocationStat = ({
+  runs, changeYear, changeCity, changeTitle,
+}) => (
   <div className="fl w-100 w-30-l pb5 pr5-l">
     <section className="pb4" style={{ paddingBottom: '0rem' }}>
       <p>
@@ -277,17 +296,16 @@ const LocationStat = ({ runs, onClick }) => (
     </section>
     <hr color="red" />
     <LocationSummary key="locationsSummary" />
-    <CitiesStat />
-    <PeriodStat />
-    <YearStat key="Total" runs={runs} year="Total" onClick={onClick} />
+    <CitiesStat onClick={changeCity} />
+    <PeriodStat onClick={changeTitle} />
+    <YearStat key="Total" runs={runs} year="Total" onClick={changeYear} />
   </div>
 );
 
 const YearStat = ({ runs, year, onClick }) => {
-
   // for hover
   const [hovered, eventHandlers] = useHover();
-  // lazy Component
+  lazy Component
   const YearSvg = React.lazy(() =>
     import(`../../assets/year_${year}.svg`)
     .catch(() => ({ default: () => <div></div> }))
@@ -340,7 +358,7 @@ const YearStat = ({ runs, year, onClick }) => {
           <Stat value={avgHeartRate} description=" Avg Heart Rate" />
         )}
       </section>
-      {hovered && <React.Suspense fallback={'loading...'}><YearSvg className={styles.yearSVG} /></React.Suspense>}
+      {hovered && <React.Suspense fallback="loading..."><YearSvg className={styles.yearSVG} /></React.Suspense>}
       <hr color="red" />
     </div>
   );
@@ -358,14 +376,14 @@ const LocationSummary = () => (
   </div>
 );
 
-const CitiesStat = () => {
+const CitiesStat = ({ onClick }) => {
   const citiesArr = Object.entries(cities);
   citiesArr.sort((a, b) => b[1] - a[1]);
   return (
     <div style={{ cursor: 'pointer' }}>
       <section>
         {citiesArr.map(([city, distance]) => (
-          <Stat key={city} value={city} description={` ${(distance / 1000).toFixed(0)} KM`} citySize={3} />
+          <Stat key={city} value={city} description={` ${(distance / 1000).toFixed(0)} KM`} citySize={3} onClick={() => onClick(city)} />
         ))}
       </section>
       <hr color="red" />
@@ -373,14 +391,14 @@ const CitiesStat = () => {
   );
 };
 
-const PeriodStat = () => {
+const PeriodStat = ({ onClick }) => {
   const periodArr = Object.entries(runPeriod);
   periodArr.sort((a, b) => b[1] - a[1]);
   return (
     <div style={{ cursor: 'pointer' }}>
       <section>
         {periodArr.map(([period, times]) => (
-          <Stat key={period} value={period} description={` ${times} Runs`} citySize={3} />
+          <Stat key={period} value={period} description={` ${times} Runs`} citySize={3} onClick={() => onClick(period)} />
         ))}
       </section>
       <hr color="red" />
@@ -520,9 +538,8 @@ const RunMapButtons = ({ changeYear }) => {
 };
 
 const RunTable = ({
-  runs, year, locateActivity, setActivity,
+  runs, locateActivity, setActivity, runIndex, setRunIndex,
 }) => {
-  const [runIndex, setRunIndex] = useState(-1);
   const [sortFuncInfo, setSortFuncInfo] = useState('');
   // TODO refactor?
   const sortKMFunc = (a, b) => (sortFuncInfo === 'KM' ? a.distance - b.distance : b.distance - a.distance);
@@ -547,7 +564,7 @@ const RunTable = ({
       const el = document.getElementsByClassName(styles.runRow);
       el[runIndex].style.color = 'rgb(224,237,94)';
     }
-    setActivity(filterAndSortRuns(runs, year, f));
+    setActivity(runs.sort(f));
   };
 
   return (
@@ -619,10 +636,13 @@ const RunRow = ({
 };
 
 const Stat = ({
-  value, description, className, citySize,
+  value, description, className, citySize, onClick,
 }) => (
-  <div className={`${className} pb2 w-100`}>
-    <span className={`f${citySize || 1} fw9 i`}>{intComma(value)}</span>
+  <div className={`${className} pb2 w-100`} onClick={onClick}>
+    <span className={`f${citySize || 1} fw9 i`}>
+      {intComma(value)}
+      {' '}
+    </span>
     <span className="f3 fw6 i">{description}</span>
   </div>
 );
