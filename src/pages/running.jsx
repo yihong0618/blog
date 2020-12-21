@@ -305,7 +305,7 @@ const LocationStat = ({
 const YearStat = ({ runs, year, onClick }) => {
   // for hover
   const [hovered, eventHandlers] = useHover();
-  lazy Component
+  // lazy Component
   const YearSvg = React.lazy(() =>
     import(`../../assets/year_${year}.svg`)
     .catch(() => ({ default: () => <div></div> }))
