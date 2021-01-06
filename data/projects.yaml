@@ -118,3 +118,19 @@
   repo: gnebbia/kb 
   languages:
     - Python
+
+- name: shanbay_remember
+  role: author
+  primary: false
+  description: using telegram to remember shanbay words 
+  repo: yihong0618/shanbay_remember
+  languages:
+    - JavaScript
+
+- name: github-readme-stats
+  role: author
+  primary: false
+  description: generate my_github status using GitHub Actions
+  repo: yihong0618/github-readme-stats
+  languages:
+    - Go

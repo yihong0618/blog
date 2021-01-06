@@ -64,7 +64,7 @@ jobs:
           python scripts/gpxtrackposter/cli.py  --language zh_CN --gpx-dir ./GPX_OUT --title "Yihong0618 Running" --type github --athlete "yihong0618" --special-distance 10 --special-distance2 20 --special-color yellow --special-color2 red --output assets/github.svg --use-localtime --min-distance 0.5
           python scripts/gpxtrackposter/cli.py  --language zh_CN --gpx-dir ./GPX_OUT --title "Over 10km Runs" --type grid --athlete "yihong0618"  --output assets/grid.svg --min-distance 10.0 --special-color yellow --special-color2 red --special-distance 20 --special-distance2 40 --use-localtime
           python scripts/gpxtrackposter/cli.py  --gpx-dir ./GPX_OUT --type circular --use-localtime
-          python scripts/gpxtrackposter/cli.py --year 2020  --language zh_CN --gpx-dir ./GPX_OUT --title "2020 Running" --type github --athlete "yihong0618" --special-distance 10 --special-distance2 20 --special-color yellow --special-color2 red --output assets/github_2020.svg --use-localtime --min-distance 0.5
+          python scripts/gpxtrackposter/cli.py --year 2021  --language zh_CN --gpx-dir ./GPX_OUT --title "2020 Running" --type github --athlete "yihong0618" --special-distance 10 --special-distance2 20 --special-color yellow --special-color2 red --output assets/github_2021.svg --use-localtime --min-distance 0.5
 
       - name: Push new runs
         uses: github-actions-x/commit@v2.6
