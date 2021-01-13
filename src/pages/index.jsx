@@ -34,7 +34,7 @@ export default ({ data }) => {
               <p>
                 2015年从机械行业转行互联网游戏行业，
                 2018年从数据分析师正式转行成为程序员， 热爱编程，偏爱Python，
-                热爱游戏，偏爱任天堂， 热爱跑步，跑龄23年，跑过几次马拉松，PB
+                热爱游戏，偏爱任天堂， 热爱跑步，跑龄24年，跑过几次马拉松，PB
                 4小时1分钟
               </p>
               <ul className="list pl0 b pt3">
@@ -100,7 +100,7 @@ export default ({ data }) => {
                     href="https://tuzi.moe/"
                     className="link blue no-underline"
                   >
-                    兔子鮮笙: 19 岁的天才少年
+                    兔子鮮笙: 20 岁的天才少年
                   </a>
                 </h3>
                 <h3>
