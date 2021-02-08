@@ -1,10 +1,10 @@
 {
-    "id": "14547a59-6db5-4e4b-b33f-2a821616e020",
+    "id": "d62c5ff9-0ef3-4b3f-9c67-58dc8daab8c9",
     "type": "run",
     "app_id": "com.nike.sport.running.ios",
     "start_epoch_ms": 1612785954576,
     "end_epoch_ms": 1612790117597,
-    "last_modified": 1612790125871,
+    "last_modified": 1612790242590,
     "active_duration_ms": 4160239,
     "session": false,
     "delete_indicator": false,
@@ -99,7 +99,7 @@
         "location": "outdoors"
     },
     "change_tokens": [
-        "3886bdbf4a2d3154c3d0a749a9a2f3022aa97103c557d303b793de0277865ecb:1612790125871"
+        "d305974c4bf16435bda53bbb93097a7e5777fc7878ae715c00a861f0592b3579:1612790242590"
     ],
     "metric_types": [
         "elevation",
