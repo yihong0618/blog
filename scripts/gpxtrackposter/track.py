@@ -31,7 +31,7 @@ class Track:
         self.special = False
         self.average_heartrate = None
         self.moving_dict = {}
-        self.run_id = 0
+        self.strava_id = 0
         self.start_latlng = []
 
     def load_gpx(self, file_name):
@@ -51,7 +51,7 @@ class Track:
 
     def load_from_db(self, activate):
         # use strava as file name
-        self.file_names = [str(activate.run_id)]
+        self.file_names = [str(activate.strava_id)]
         start_time = datetime.datetime.strptime(
             activate.start_date_local, "%Y-%m-%d %H:%M:%S"
         )
@@ -73,7 +73,7 @@ class Track:
     def _load_gpx_data(self, gpx):
         self.start_time, self.end_time = gpx.get_time_bounds()
         # use timestamp as id
-        self.run_id = int(datetime.datetime.timestamp(self.start_time) * 1000)
+        self.strava_id = int(datetime.datetime.timestamp(self.start_time) * 1000)
         self.start_time_local, self.end_time_local = parse_datetime_to_local(
             self.start_time, self.end_time, gpx
         )
@@ -207,7 +207,7 @@ class Track:
 
     def to_namedtuple(self):
         d = {
-            "id": self.run_id,
+            "id": self.strava_id,
             "name": "run from gpx",  # maybe change later
             "type": "Run",  # Run for now only support run for now maybe change later
             "start_date": self.start_time.strftime("%Y-%m-%d %H:%M:%S"),
