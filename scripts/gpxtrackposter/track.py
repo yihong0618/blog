@@ -9,48 +9,32 @@ import gpxpy as mod_gpxpy
 import json
 import os
 import s2sphere as s2
-from exceptions import TrackLoadError
-from utils import parse_datetime_to_local
+from .exceptions import TrackLoadError
+from .utils import parse_datetime_to_local
+import polyline
+from collections import namedtuple
+
+start_point = namedtuple("start_point", "lat lon")
+run_map = namedtuple("polyline", "summary_polyline")
 
 
 class Track:
-    """Create and maintain info about a given activity track (corresponding to one GPX file).
-
-    Attributes:
-        file_names: Basename of a given file passed in load_gpx.
-        polylines: Lines interpolated between each coordinate.
-        start_time: Activity start time.
-        end_time: Activity end time.
-        length: Length of the track (2-dimensional).
-        self.special: True if track is special, else False.
-
-    Methods:
-        load_gpx: Load a GPX file into the current track.
-        bbox: Compute the border box of the track.
-        append: Append other track to current track.
-        load_cache: Load track from cached json data.
-        store_cache: Cache the current track.
-    """
-
     def __init__(self):
         self.file_names = []
         self.polylines = []
-        self.use_local_time = False
+        self.polyline_str = ""
         self.start_time = None
         self.end_time = None
+        self.start_time_local = None
+        self.end_time_local = None
         self.length = 0
         self.special = False
+        self.average_heartrate = None
+        self.moving_dict = {}
+        self.run_id = 0
+        self.start_latlng = []
 
-    def load_gpx(self, file_name: str):
-        """Load the GPX file into self.
-
-        Args:
-            file_name: GPX file to be loaded .
-
-        Raises:
-            TrackLoadError: An error occurred while parsing the GPX file (empty or bad format).
-            PermissionError: An error occurred while opening the GPX file.
-        """
+    def load_gpx(self, file_name):
         try:
             self.file_names = [os.path.basename(file_name)]
             # Handle empty gpx files
@@ -59,16 +43,26 @@ class Track:
                 raise TrackLoadError("Empty GPX file")
             with open(file_name, "r") as file:
                 self._load_gpx_data(mod_gpxpy.parse(file))
-        except TrackLoadError as e:
-            raise e
-        except mod_gpxpy.gpx.GPXXMLSyntaxException as e:
-            raise TrackLoadError("Failed to parse GPX.") from e
-        except PermissionError as e:
-            raise TrackLoadError("Cannot load GPX (bad permissions)") from e
-        except Exception as e:
-            raise TrackLoadError("Something went wrong when loading GPX.") from e
+        except:
+            print(
+                f"Something went wrong when loading GPX. for file {self.file_names[0]}, we just ignore this file and continue"
+            )
+            pass
 
-    def bbox(self) -> s2.LatLngRect:
+    def load_from_db(self, activate):
+        # use strava as file name
+        self.file_names = [str(activate.run_id)]
+        start_time = datetime.datetime.strptime(
+            activate.start_date_local, "%Y-%m-%d %H:%M:%S"
+        )
+        self.start_time_local = start_time
+        self.end_time = start_time + activate.elapsed_time
+        self.length = float(activate.distance)
+        summary_polyline = activate.summary_polyline
+        polyline_data = polyline.decode(summary_polyline) if summary_polyline else []
+        self.polylines = [[s2.LatLng.from_degrees(p[0], p[1]) for p in polyline_data]]
+
+    def bbox(self):
         """Compute the smallest rectangle that contains the entire track (border box)."""
         bbox = s2.LatLngRect()
         for line in self.polylines:
@@ -76,10 +70,13 @@ class Track:
                 bbox = bbox.union(s2.LatLngRect.from_point(latlng.normalized()))
         return bbox
 
-    def _load_gpx_data(self, gpx: "mod_gpxpy.gpx.GPX"):
+    def _load_gpx_data(self, gpx):
         self.start_time, self.end_time = gpx.get_time_bounds()
-        if self.use_local_time:
-            self.start_time, self.end_time = parse_datetime_to_local(self.start_time, self.end_time, gpx)
+        # use timestamp as id
+        self.run_id = int(datetime.datetime.timestamp(self.start_time) * 1000)
+        self.start_time_local, self.end_time_local = parse_datetime_to_local(
+            self.start_time, self.end_time, gpx
+        )
         if self.start_time is None:
             raise TrackLoadError("Track has no start time.")
         if self.end_time is None:
@@ -88,30 +85,61 @@ class Track:
         if self.length == 0:
             raise TrackLoadError("Track is empty.")
         gpx.simplify()
+        polyline_container = []
+        heart_rate_list = []
         for t in gpx.tracks:
             for s in t.segments:
+                try:
+                    heart_rate_list.extend(
+                        [
+                            int(p.extensions[0].getchildren()[0].text)
+                            for p in s.points
+                            if p.extensions
+                        ]
+                    )
+                except:
+                    pass
                 line = [
                     s2.LatLng.from_degrees(p.latitude, p.longitude) for p in s.points
                 ]
                 self.polylines.append(line)
+                polyline_container.extend([[p.latitude, p.longitude] for p in s.points])
+                self.polyline_container = polyline_container
+        # get start point
+        try:
+            self.start_latlng = start_point(*polyline_container[0])
+        except:
+            pass
+        self.polyline_str = polyline.encode(polyline_container)
+        self.average_heartrate = (
+            sum(heart_rate_list) / len(heart_rate_list) if heart_rate_list else None
+        )
+        self.moving_dict = self._get_moving_data(gpx)
 
-    def append(self, other: "Track"):
+    def append(self, other):
         """Append other track to self."""
         self.end_time = other.end_time
-        self.polylines.extend(other.polylines)
         self.length += other.length
-        self.file_names.extend(other.file_names)
-        self.special = self.special or other.special
+        # TODO maybe a better way
+        try:
+            self.moving_dict["distance"] += other.moving_dict["distance"]
+            self.moving_dict["moving_time"] += other.moving_dict["moving_time"]
+            self.moving_dict["elapsed_time"] += other.moving_dict["elapsed_time"]
+            self.polyline_container.extend(other.polyline_container)
+            self.polyline_str = polyline.encode(self.polyline_container)
+            self.moving_dict["average_speed"] = (
+                self.moving_dict["distance"]
+                / self.moving_dict["moving_time"].total_seconds()
+            )
+            self.file_names.extend(other.file_names)
+            self.special = self.special or other.special
+        except:
+            print(
+                f"something wrong append this {self.end_time},in files {str(self.file_names)}"
+            )
+            pass
 
-    def load_cache(self, cache_file_name: str):
-        """Load the track from a previously cached track
-
-        Args:
-            cache_file_name: Filename of the cached track to be loaded.
-
-        Raises:
-            TrackLoadError: An error occurred while loading the track data from the cache file.
-        """
+    def load_cache(self, cache_file_name):
         try:
             with open(cache_file_name) as data_file:
                 data = json.load(data_file)
@@ -120,6 +148,12 @@ class Track:
                 )
                 self.end_time = datetime.datetime.strptime(
                     data["end"], "%Y-%m-%d %H:%M:%S"
+                )
+                self.start_time_local = datetime.datetime.strptime(
+                    data["start_local"], "%Y-%m-%d %H:%M:%S"
+                )
+                self.end_time_local = datetime.datetime.strptime(
+                    data["end_local"], "%Y-%m-%d %H:%M:%S"
                 )
                 self.length = float(data["length"])
                 self.polylines = []
@@ -133,7 +167,7 @@ class Track:
         except Exception as e:
             raise TrackLoadError("Failed to load track data from cache.") from e
 
-    def store_cache(self, cache_file_name: str):
+    def store_cache(self, cache_file_name):
         """Cache the current track"""
         dir_name = os.path.dirname(cache_file_name)
         if not os.path.isdir(dir_name):
@@ -151,8 +185,42 @@ class Track:
                 {
                     "start": self.start_time.strftime("%Y-%m-%d %H:%M:%S"),
                     "end": self.end_time.strftime("%Y-%m-%d %H:%M:%S"),
+                    "start_local": self.start_time_local.strftime("%Y-%m-%d %H:%M:%S"),
+                    "end_local": self.end_time_local.strftime("%Y-%m-%d %H:%M:%S"),
                     "length": self.length,
                     "segments": lines_data,
                 },
                 json_file,
             )
+
+    @staticmethod
+    def _get_moving_data(gpx):
+        moving_data = gpx.get_moving_data()
+        return {
+            "distance": moving_data.moving_distance,
+            "moving_time": datetime.timedelta(seconds=moving_data.moving_time),
+            "elapsed_time": datetime.timedelta(
+                seconds=(moving_data.moving_time + moving_data.stopped_time)
+            ),
+            "average_speed": moving_data.moving_distance / moving_data.moving_time,
+        }
+
+    def to_namedtuple(self):
+        d = {
+            "id": self.run_id,
+            "name": "run from gpx",  # maybe change later
+            "type": "Run",  # Run for now only support run for now maybe change later
+            "start_date": self.start_time.strftime("%Y-%m-%d %H:%M:%S"),
+            "end": self.end_time.strftime("%Y-%m-%d %H:%M:%S"),
+            "start_date_local": self.start_time_local.strftime("%Y-%m-%d %H:%M:%S"),
+            "end_local": self.end_time_local.strftime("%Y-%m-%d %H:%M:%S"),
+            "length": self.length,
+            "average_heartrate": int(self.average_heartrate)
+            if self.average_heartrate
+            else None,
+            "map": run_map(self.polyline_str),
+            "start_latlng": self.start_latlng,
+        }
+        d.update(self.moving_dict)
+        # return a nametuple that can use . to get attr
+        return namedtuple("x", d.keys())(*d.values())

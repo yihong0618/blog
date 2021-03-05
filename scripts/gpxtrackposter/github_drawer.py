@@ -3,11 +3,11 @@ import datetime
 import locale
 import svgwrite
 
-import utils
-from exceptions import PosterError
-from poster import Poster
-from tracks_drawer import TracksDrawer
-from xy import XY
+from .utils import format_float
+from .exceptions import PosterError
+from .poster import Poster
+from .tracks_drawer import TracksDrawer
+from .xy import XY
 
 
 class GithubDrawer(TracksDrawer):
@@ -33,24 +33,42 @@ class GithubDrawer(TracksDrawer):
                 -start_date_weekday
             )
             year_length = total_length_year_dict.get(year, 0)
-            year_length = utils.format_float(self.poster.m2u(year_length))
-            month_names = [
-                locale.nl_langinfo(day)[:3]  # Get only first three letters
-                for day in [
-                    locale.MON_1,
-                    locale.MON_2,
-                    locale.MON_3,
-                    locale.MON_4,
-                    locale.MON_5,
-                    locale.MON_6,
-                    locale.MON_7,
-                    locale.MON_8,
-                    locale.MON_9,
-                    locale.MON_10,
-                    locale.MON_11,
-                    locale.MON_12,
+            year_length = format_float(self.poster.m2u(year_length))
+            try:
+                month_names = [
+                    locale.nl_langinfo(day)[:3]  # Get only first three letters
+                    for day in [
+                        locale.MON_1,
+                        locale.MON_2,
+                        locale.MON_3,
+                        locale.MON_4,
+                        locale.MON_5,
+                        locale.MON_6,
+                        locale.MON_7,
+                        locale.MON_8,
+                        locale.MON_9,
+                        locale.MON_10,
+                        locale.MON_11,
+                        locale.MON_12,
+                    ]
                 ]
-            ]
+                # support windows or others doesn't support locale Name, by Hard code
+            except Exception as e:
+                print(str(e))
+                month_names = [
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Aug",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dec",
+                ]
             km_or_mi = "mi"
             if self.poster.units == "metric":
                 km_or_mi = "km"
@@ -108,7 +126,7 @@ class GithubDrawer(TracksDrawer):
                             color = self.poster.colors.get(
                                 "special2"
                             ) or self.poster.colors.get("special")
-                        str_length = utils.format_float(self.poster.m2u(length))
+                        str_length = format_float(self.poster.m2u(length))
                         date_title = f"{date_title} {str_length} {km_or_mi}"
 
                     rect = dr.rect((rect_x, rect_y), dom, fill=color)

@@ -10,13 +10,13 @@ import datetime
 import math
 import svgwrite
 from typing import List, Optional
-from exceptions import PosterError
-from poster import Poster
-from track import Track
-from tracks_drawer import TracksDrawer
-from value_range import ValueRange
-from xy import XY
-import utils
+from .exceptions import PosterError
+from .poster import Poster
+from .track import Track
+from .tracks_drawer import TracksDrawer
+from .value_range import ValueRange
+from .xy import XY
+from .utils import compute_grid
 
 
 class CircularDrawer(TracksDrawer):
@@ -71,7 +71,7 @@ class CircularDrawer(TracksDrawer):
             return
 
         years = self.poster.years.count()
-        _, counts = utils.compute_grid(years, size)
+        _, counts = compute_grid(years, size)
         if counts is None:
             raise PosterError("Unable to compute grid.")
         count_x, count_y = counts[0], counts[1]

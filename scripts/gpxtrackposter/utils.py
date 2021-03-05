@@ -11,9 +11,9 @@ import pytz
 from datetime import datetime
 from typing import List, Optional, Tuple
 import s2sphere as s2
-from value_range import ValueRange
+from .value_range import ValueRange
 from timezonefinder import TimezoneFinder
-from xy import XY
+from .xy import XY
 
 
 # mercator projection
@@ -41,7 +41,9 @@ def project(
     min_y = lat2y(bbox.lat_lo().degrees)
     max_y = lat2y(bbox.lat_hi().degrees)
     d_y = abs(max_y - min_y)
-
+    # the distance maybe zero
+    if d_x == 0 or d_y == 0:
+        return []
     scale = size.x / d_x if size.x / size.y <= d_x / d_y else size.y / d_y
     offset = offset + 0.5 * (size - scale * XY(d_x, -d_y)) - scale * XY(min_x, min_y)
     lines = []
@@ -111,7 +113,9 @@ def format_float(f) -> str:
     return locale.format_string("%.1f", f)
 
 
-def parse_datetime_to_local(start_time: datetime,  end_time: datetime, gpx: "mod_gpxpy.gpx.GPX") -> Tuple[datetime, datetime]:
+def parse_datetime_to_local(
+    start_time: datetime, end_time: datetime, gpx: "mod_gpxpy.gpx.GPX"
+) -> Tuple[datetime, datetime]:
     # just parse the start time, because start/end maybe different
     offset = start_time.utcoffset()
     if offset:

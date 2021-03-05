@@ -1,8 +1,6 @@
 import json
-import datetime
 import logging
 import os.path
-import sys
 import argparse
 import time
 

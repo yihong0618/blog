@@ -5,10 +5,10 @@ from collections import defaultdict
 import gettext
 import locale
 import svgwrite
-from utils import format_float
-from value_range import ValueRange
-from xy import XY
-from year_range import YearRange
+from .utils import format_float
+from .value_range import ValueRange
+from .xy import XY
+from .year_range import YearRange
 
 
 class Poster:
@@ -56,8 +56,7 @@ class Poster:
         self.tracks_drawer = None
         self.trans = None
         self.set_language(None)
-        self.drawer_type = None
-        self.tc_offset = datetime.now(pytz.timezone('Asia/Shanghai')).utcoffset()
+        self.tc_offset = datetime.now(pytz.timezone("Asia/Shanghai")).utcoffset()
 
     def set_language(self, language):
         if language:
@@ -89,9 +88,9 @@ class Poster:
         self.length_range_by_date = ValueRange()
         self.__compute_years(tracks)
         for track in tracks:
-            if not self.years.contains(track.start_time):
+            if not self.years.contains(track.start_time_local):
                 continue
-            text_date = track.start_time.strftime("%Y-%m-%d")
+            text_date = track.start_time_local.strftime("%Y-%m-%d")
             if text_date in self.tracks_by_date:
                 self.tracks_by_date[text_date].append(track)
             else:
@@ -241,10 +240,10 @@ class Poster:
         weeks = {}
         for t in self.tracks:
             total_length += t.length
-            total_length_year_dict[t.start_time.year] += t.length
+            total_length_year_dict[t.start_time_local.year] += t.length
             length_range.extend(t.length)
             # time.isocalendar()[1] -> week number
-            weeks[(t.start_time.year, t.start_time.isocalendar()[1])] = 1
+            weeks[(t.start_time_local.year, t.start_time_local.isocalendar()[1])] = 1
         self.total_length_year_dict = total_length_year_dict
         return (
             total_length,
@@ -259,4 +258,4 @@ class Poster:
             return
         self.years = YearRange()
         for t in tracks:
-            self.years.add(t.start_time)
+            self.years.add(t.start_time_local)

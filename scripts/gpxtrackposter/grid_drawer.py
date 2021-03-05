@@ -5,12 +5,12 @@
 # license that can be found in the LICENSE file.
 
 import svgwrite
-from exceptions import PosterError
-from poster import Poster
-from track import Track
-from tracks_drawer import TracksDrawer
-from xy import XY
-import utils
+from .exceptions import PosterError
+from .poster import Poster
+from .track import Track
+from .tracks_drawer import TracksDrawer
+from .xy import XY
+from .utils import format_float, project, compute_grid
 
 
 class GridDrawer(TracksDrawer):
@@ -27,7 +27,7 @@ class GridDrawer(TracksDrawer):
         """For each track, draw it on the poster."""
         if self.poster.tracks is None:
             raise PosterError("No tracks to draw.")
-        cell_size, counts = utils.compute_grid(len(self.poster.tracks), size)
+        cell_size, counts = compute_grid(len(self.poster.tracks), size)
         if cell_size is None or counts is None:
             raise PosterError("Unable to compute grid.")
         count_x, count_y = counts[0], counts[1]
@@ -53,28 +53,26 @@ class GridDrawer(TracksDrawer):
     def _draw_track(self, dr: svgwrite.Drawing, tr: Track, size: XY, offset: XY):
         color = self.color(self.poster.length_range, tr.length, tr.special)
 
-        str_length = utils.format_float(self.poster.m2u(tr.length))
-        
-        date_title = f"{str(tr.start_time)[:10]} {str_length}km"
-        for line in utils.project(tr.bbox(), size, offset, tr.polylines):
+        str_length = format_float(self.poster.m2u(tr.length))
+
+        date_title = f"{str(tr.start_time_local)[:10]} {str_length}km"
+        for line in project(tr.bbox(), size, offset, tr.polylines):
 
             distance1 = self.poster.special_distance["special_distance"]
             distance2 = self.poster.special_distance["special_distance2"]
             has_special = distance1 < tr.length / 1000 < distance2
-            color = self.color(
-                self.poster.length_range_by_date, tr.length, has_special
-            )
+            color = self.color(self.poster.length_range_by_date, tr.length, has_special)
             if tr.length / 1000 >= distance2:
-                color = self.poster.colors.get(
-                    "special2"
-                ) or self.poster.colors.get("special")
-            polyline = dr.polyline(
-                    points=line,
-                    stroke=color,
-                    fill="none",
-                    stroke_width=0.5,
-                    stroke_linejoin="round",
-                    stroke_linecap="round",
+                color = self.poster.colors.get("special2") or self.poster.colors.get(
+                    "special"
                 )
+            polyline = dr.polyline(
+                points=line,
+                stroke=color,
+                fill="none",
+                stroke_width=0.5,
+                stroke_linejoin="round",
+                stroke_linecap="round",
+            )
             polyline.set_desc(title=date_title)
             dr.add(polyline)
