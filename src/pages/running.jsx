@@ -207,7 +207,7 @@ export default () => {
           stroke-dasharray: 0 ${length};\
         }\
         to {\
-          stroke-dasharray: ${length} 0;\
+          stroke-dasharray: ${length} ${length-1000};\
         }\
       }`;
       polyline.appendChild(keyFrames)
