@@ -15,6 +15,7 @@ __app_author__ = "flopp.net"
 
 SQL_FILE = "scripts/data.db"
 
+
 def main():
     """Handle command line arguments and call other modules as needed."""
 

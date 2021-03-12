@@ -30,6 +30,7 @@ def run(client_id, client_secret, refresh_token):
         f.write("\n")
         f.write("export {activities, strava_athlete};\n")
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("client_id", help="strava client id")
@@ -37,5 +38,5 @@ if __name__ == "__main__":
     parser.add_argument("refresh_token", help="strava refresh token")
     options = parser.parse_args()
     # maybe upload not done just tricky
-    time.sleep(5) # 5 seconds seems enough 
+    time.sleep(5)  # 5 seconds seems enough
     run(options.client_id, options.client_secret, options.refresh_token)

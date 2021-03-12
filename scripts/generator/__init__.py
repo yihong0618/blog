@@ -13,19 +13,22 @@ from .db import init_db, update_or_create_activity, Athlete, Activity
 
 
 class Generator:
-    def __init__(self, db_path: str, client_id: str, client_secret: str, refresh_token: str):
+    def __init__(
+        self, db_path: str, client_id: str, client_secret: str, refresh_token: str
+    ):
         self.client = stravalib.Client()
         self.session = init_db(db_path)
 
         self.client_id = client_id
         self.client_secret = client_secret
-        self.refresh_token = refresh_token 
-
+        self.refresh_token = refresh_token
 
     def check_access(self) -> None:
         now = datetime.datetime.fromtimestamp(time.time())
         response = self.client.refresh_access_token(
-            client_id=self.client_id, client_secret=self.client_secret, refresh_token=self.refresh_token,
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            refresh_token=self.refresh_token,
         )
         # Update the authdata object
         self.access_token = response["access_token"]
@@ -42,7 +45,9 @@ class Generator:
         athlete = self.session.query(Athlete).filter_by(id=strava_athlete.id).first()
         if not athlete:
             athlete = Athlete(
-                id=strava_athlete.id, firstname=strava_athlete.firstname, lastname=strava_athlete.lastname,
+                id=strava_athlete.id,
+                firstname=strava_athlete.firstname,
+                lastname=strava_athlete.lastname,
             )
             self.session.add(athlete)
             self.session.commit()
@@ -71,7 +76,11 @@ class Generator:
 
     def load(self) -> Tuple[Dict, List[Dict]]:
         athlete = self.session.query(Athlete).first()
-        activities = self.session.query(Activity).filter_by(athlete_id=athlete.id).order_by(Activity.start_date_local)
+        activities = (
+            self.session.query(Activity)
+            .filter_by(athlete_id=athlete.id)
+            .order_by(Activity.start_date_local)
+        )
 
         athlete_dict = athlete.to_dict()
         activity_list = []
@@ -81,7 +90,9 @@ class Generator:
         for activity in activities:
             # Determine running streak.
             if activity.type == "Run":
-                date = datetime.datetime.strptime(activity.start_date_local, "%Y-%m-%d %H:%M:%S").date()
+                date = datetime.datetime.strptime(
+                    activity.start_date_local, "%Y-%m-%d %H:%M:%S"
+                ).date()
                 if last_date is None:
                     streak = 1
                 elif date == last_date:

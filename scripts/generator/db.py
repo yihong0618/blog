@@ -36,12 +36,15 @@ class Athlete(Base):
     def to_dict(self) -> Dict:
         return {"id": self.id, "firstname": self.firstname, "lastname": self.lastname}
 
+
 # reverse the location (lan, lon) -> location detail
 g = Nominatim(user_agent="yihong0618")
 
 
 def is_point_on_track(
-    point: Tuple[float, float], track: List[Tuple[float, float]], max_distance_meters: float = 100
+    point: Tuple[float, float],
+    track: List[Tuple[float, float]],
+    max_distance_meters: float = 100,
 ) -> bool:
     point_lat, point_lon = point
     for coordinates in track:
@@ -92,8 +95,8 @@ class Activity(Base):
     location_country = Column(String)
     summary_polyline = Column(String)
     track = Column(PickleType)
-    average_heartrate =  Column(Float)
-    average_speed =  Column(Float)
+    average_heartrate = Column(Float)
+    average_speed = Column(Float)
     pois = None
     streak = None
 
@@ -115,7 +118,9 @@ class Activity(Base):
             track_pois = []
             for (name, point) in pois.items():
                 lat, lon = point["lat"], point["lon"]
-                if not lat_range.contains(lat, 0.01) or not lon_range.contains(lon, 0.01):
+                if not lat_range.contains(lat, 0.01) or not lon_range.contains(
+                    lon, 0.01
+                ):
                     continue
                 if is_point_on_track((lat, lon), self.track):
                     track_pois.append(name)
@@ -143,20 +148,25 @@ class Activity(Base):
 
 def update_or_create_activity(session, athlete, strava_activity):
     created = False
-    activity = session.query(Activity).filter_by(strava_id=int(strava_activity.id)).first()
+    activity = (
+        session.query(Activity).filter_by(strava_id=int(strava_activity.id)).first()
+    )
     if not activity:
         start_point = strava_activity.start_latlng
         location_country = strava_activity.location_country
         if start_point:
             try:
-                location_country = str(g.reverse(f"{start_point.lat}, {start_point.lon}"))
+                location_country = str(
+                    g.reverse(f"{start_point.lat}, {start_point.lon}")
+                )
             # limit (only for the first time)
             except:
                 print("+++++++limit+++++++")
                 time.sleep(60)
-                location_country = str(g.reverse(f"{start_point.lat}, {start_point.lon}"))
-                
-            
+                location_country = str(
+                    g.reverse(f"{start_point.lat}, {start_point.lon}")
+                )
+
         activity = Activity(
             strava_id=strava_activity.id,
             athlete=athlete,
@@ -181,8 +191,8 @@ def update_or_create_activity(session, athlete, strava_activity):
         activity.elapsed_time = strava_activity.elapsed_time
         activity.total_elevation_gain = float(strava_activity.total_elevation_gain)
         activity.type = strava_activity.type
-        activity.average_heartrate=strava_activity.average_heartrate
-        activity.average_speed=float(strava_activity.average_speed)
+        activity.average_heartrate = strava_activity.average_heartrate
+        activity.average_speed = float(strava_activity.average_speed)
     try:
         decoded = polyline.decode(strava_activity.map.summary_polyline)
         activity.summary_polyline = strava_activity.map.summary_polyline
@@ -195,7 +205,9 @@ def update_or_create_activity(session, athlete, strava_activity):
 
 
 def init_db(db_path: str) -> Session:
-    engine = create_engine(f"sqlite:///{db_path}", connect_args={"check_same_thread": False})
+    engine = create_engine(
+        f"sqlite:///{db_path}", connect_args={"check_same_thread": False}
+    )
     Base.metadata.create_all(engine)
     session = sessionmaker(bind=engine)
     return session()
