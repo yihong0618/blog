@@ -9,14 +9,14 @@ import calendar
 import datetime
 import math
 import svgwrite
-from typing import List, Optional
+from svgwrite import animate
+from typing import Optional
 from .exceptions import PosterError
 from .poster import Poster
-from .track import Track
 from .tracks_drawer import TracksDrawer
 from .value_range import ValueRange
 from .xy import XY
-from .utils import compute_grid
+from .utils import compute_grid, make_key_times
 
 
 class CircularDrawer(TracksDrawer):
@@ -115,6 +115,7 @@ class CircularDrawer(TracksDrawer):
         df = 360.0 / (366 if calendar.isleap(year) else 365)
         day = 0
         date = datetime.date(year, 1, 1)
+        animate_index = 1
         while date.year == year:
             text_date = date.strftime("%Y-%m-%d")
             a1 = math.radians(day * df)
@@ -155,7 +156,11 @@ class CircularDrawer(TracksDrawer):
                 )
                 text.add(tpath)
                 dr.add(text)
+            year_count = self.poster.year_tracks_date_count_dict.get(year)
+            key_times = make_key_times(year_count)
             if text_date in self.poster.tracks_by_date:
+                values = ";".join(["0"] * animate_index)  + ";"  + ";".join(["1"] * (len(key_times) - animate_index))
+                # print(values, len(key_times))
                 self._draw_circle_segment(
                     dr,
                     self.poster.tracks_by_date[text_date],
@@ -163,7 +168,10 @@ class CircularDrawer(TracksDrawer):
                     a2,
                     radius_range,
                     center,
+                    key_times=";".join(key_times),
+                    values=values
                 )
+                animate_index += 1
 
             day += 1
             date += datetime.timedelta(1)
@@ -185,7 +193,7 @@ class CircularDrawer(TracksDrawer):
                 break
         return ring_distance
 
-    def _draw_rings(self, dr: svgwrite.Drawing, center: XY, radius_range: ValueRange):
+    def _draw_rings(self, dr, center, radius_range):
         length_range = self.poster.length_range_by_date
         ring_distance = self._determine_ring_distance()
         if ring_distance is None:
@@ -210,12 +218,14 @@ class CircularDrawer(TracksDrawer):
 
     def _draw_circle_segment(
         self,
-        dr: svgwrite.Drawing,
-        tracks: List[Track],
-        a1: float,
-        a2: float,
+        dr,
+        tracks,
+        a1,
+        a2,
         rr: ValueRange,
-        center: XY,
+        center,
+        key_times,
+        values,
     ):
         length = sum([t.length for t in tracks])
         has_special = len([t for t in tracks if t.special]) > 0
@@ -235,4 +245,5 @@ class CircularDrawer(TracksDrawer):
         path.push("l", (r2 - r1) * sin_a1, (r1 - r2) * cos_a1)
         path.push(f"a{r2},{r2} 0 0,0 {r2 * (sin_a2 - sin_a1)},{r2 * (cos_a1 - cos_a2)}")
         path.push("l", (r1 - r2) * sin_a2, (r2 - r1) * cos_a2)
+        path.add(animate.Animate("opacity", dur="30s", values =values, keyTimes=key_times, repeatCount="indefinite"))
         dr.add(path)

@@ -7,6 +7,7 @@
 import colour
 import locale
 import math
+from itertools import takewhile, count 
 import pytz
 from datetime import datetime
 from typing import List, Optional, Tuple
@@ -114,8 +115,8 @@ def format_float(f) -> str:
 
 
 def parse_datetime_to_local(
-    start_time: datetime, end_time: datetime, gpx: "mod_gpxpy.gpx.GPX"
-) -> Tuple[datetime, datetime]:
+    start_time, end_time, gpx
+):
     # just parse the start time, because start/end maybe different
     offset = start_time.utcoffset()
     if offset:
@@ -125,3 +126,15 @@ def parse_datetime_to_local(
     timezone = tf.timezone_at(lng=lng, lat=lat)
     tc_offset = datetime.now(pytz.timezone(timezone)).utcoffset()
     return start_time + tc_offset, end_time + tc_offset
+
+
+def make_key_times(year_count):
+    """
+    year_count: year run date count
+    return: list of key times points
+
+    should append `1` because the svg keytimes rule
+    """
+    s = list(takewhile(lambda n: n < 1, count(0, 1 / year_count)))
+    s.append(1)
+    return [str(round(i, 2)) for i in s]

@@ -2,8 +2,9 @@ import calendar
 import datetime
 import locale
 import svgwrite
+from svgwrite import animate
 
-from .utils import format_float
+from .utils import format_float, make_key_times
 from .exceptions import PosterError
 from .poster import Poster
 from .tracks_drawer import TracksDrawer
@@ -107,6 +108,9 @@ class GithubDrawer(TracksDrawer):
             rect_x = 10.0
             dom = (2.6, 2.6)
             # add every day of this year for 53 weeks and per week has 7 days
+            animate_index = 1
+            year_count = self.poster.year_tracks_date_count_dict.get(year)
+            key_times = make_key_times(year_count) 
             for i in range(54):
                 rect_y = offset.y + year_size + 2
                 for j in range(7):
@@ -130,8 +134,13 @@ class GithubDrawer(TracksDrawer):
                             ) or self.poster.colors.get("special")
                         str_length = format_float(self.poster.m2u(length))
                         date_title = f"{date_title} {str_length} {km_or_mi}"
+                        # tricky
+                        if animate_index < len(key_times) - 1:
+                            animate_index += 1
 
                     rect = dr.rect((rect_x, rect_y), dom, fill=color)
+                    values = ";".join(["0"] * animate_index)  + ";"  + ";".join(["1"] * (len(key_times) - animate_index))
+                    rect.add(animate.Animate("opacity", dur="20s", values =values, keyTimes=";".join(key_times), repeatCount="1"))
                     rect.set_desc(title=date_title)
                     dr.add(rect)
                     github_rect_day += datetime.timedelta(1)

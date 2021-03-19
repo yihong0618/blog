@@ -84,6 +84,7 @@ class Poster:
         """
         self.tracks = tracks
         self.tracks_by_date = {}
+        self.year_tracks_date_count_dict = defaultdict(int) 
         self.length_range = ValueRange()
         self.length_range_by_date = ValueRange()
         self.__compute_years(tracks)
@@ -91,9 +92,11 @@ class Poster:
             if not self.years.contains(track.start_time_local):
                 continue
             text_date = track.start_time_local.strftime("%Y-%m-%d")
+            year = track.start_time_local.year
             if text_date in self.tracks_by_date:
                 self.tracks_by_date[text_date].append(track)
             else:
+                self.year_tracks_date_count_dict[year] += 1
                 self.tracks_by_date[text_date] = [track]
             self.length_range.extend(track.length)
         for tracks in self.tracks_by_date.values():
