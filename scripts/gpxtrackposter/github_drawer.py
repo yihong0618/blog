@@ -140,7 +140,7 @@ class GithubDrawer(TracksDrawer):
 
                     rect = dr.rect((rect_x, rect_y), dom, fill=color)
                     values = ";".join(["0"] * animate_index)  + ";"  + ";".join(["1"] * (len(key_times) - animate_index))
-                    rect.add(animate.Animate("opacity", dur="20s", values =values, keyTimes=";".join(key_times), repeatCount="1"))
+                    rect.add(animate.Animate("opacity", dur="10s", values =values, keyTimes=";".join(key_times), repeatCount="1"))
                     rect.set_desc(title=date_title)
                     dr.add(rect)
                     github_rect_day += datetime.timedelta(1)

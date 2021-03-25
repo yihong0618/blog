@@ -160,7 +160,6 @@ class CircularDrawer(TracksDrawer):
             key_times = make_key_times(year_count)
             if text_date in self.poster.tracks_by_date:
                 values = ";".join(["0"] * animate_index)  + ";"  + ";".join(["1"] * (len(key_times) - animate_index))
-                # print(values, len(key_times))
                 self._draw_circle_segment(
                     dr,
                     self.poster.tracks_by_date[text_date],
@@ -245,5 +244,5 @@ class CircularDrawer(TracksDrawer):
         path.push("l", (r2 - r1) * sin_a1, (r1 - r2) * cos_a1)
         path.push(f"a{r2},{r2} 0 0,0 {r2 * (sin_a2 - sin_a1)},{r2 * (cos_a1 - cos_a2)}")
         path.push("l", (r1 - r2) * sin_a2, (r2 - r1) * cos_a2)
-        path.add(animate.Animate("opacity", dur="30s", values =values, keyTimes=key_times, repeatCount="indefinite"))
+        path.add(animate.Animate("opacity", dur="10s", values =values, keyTimes=key_times, repeatCount="indefinite"))
         dr.add(path)
