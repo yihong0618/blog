@@ -83,4 +83,5 @@ jobs:
           dst: gitee/yihong0618
           dst_key: ${{ secrets.DST_KEY }}
           dst_token: ${{ secrets.DST_TOKEN }}
+          force_update: true
           static_list: "blog"
