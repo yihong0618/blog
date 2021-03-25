@@ -75,3 +75,12 @@ jobs:
           rebase: 'true'
           name: yihong0618 
           email: zouzou0208@gmail.com
+      
+      - name: sync gitee
+        uses: Yikun/hub-mirror-action@master
+        with:
+          src: github/yihong0618
+          dst: gitee/yihong0618
+          dst_key: ${{ secrets.DST_KEY }}
+          dst_token: ${{ secrets.DST_TOKEN }}
+          static_list: "blog"
