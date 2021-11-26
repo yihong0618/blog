@@ -34734,6 +34734,23 @@ const activities = [
     "average_heartrate": 164.4,
     "average_speed": 2.694,
     "streak": 8
+  },
+  {
+    "strava_id": 6309049705,
+    "athlete_id": 58330365,
+    "name": "\u508d\u665a\u8dd1\u6b65",
+    "distance": 2648.5,
+    "moving_time": "0:15:24",
+    "elapsed_time": "0:19:08",
+    "total_elevation_gain": 15.2,
+    "type": "Run",
+    "start_date": "2021-11-26 11:23:06+00:00",
+    "start_date_local": "2021-11-26 19:23:06",
+    "location_country": "\u9ad8\u80fd\u8857, \u7518\u4e95\u5b50\u533a, \u51cc\u6c34\u8857\u9053, \u7518\u4e95\u5b50\u533a, \u5927\u8fde\u5e02, \u8fbd\u5b81\u7701, 116026, \u4e2d\u56fd",
+    "summary_polyline": "aoelFsetdVNQHWJO\\a@?Wc@Mc@YSAu@g@k@Mg@WS@UOWCa@Sc@Mk@K}Ao@}@Si@UWAUIoAi@g@MS?Lw@AYRiA@q@LeAPo@Pi@z@mAPKl@y@\\e@Zq@rAuBROd@KNMTCFW?WFWZiAJU@W\\cARg@Nq@Pm@LkBNo@DYHq@FiAXcADq@^cBPiAXcAf@}@FSNURKLQHSB[r@sAPMR?RDPANg@PDRKPONIRC`Bw@d@Qf@OPOhAg@|@kAHW@WIS_@]a@Wo@qAQM]a@ISOSa@][c@kAoAS@c@\\KPWd@Sj@ORIR[d@a@`AKRIVOPWhAIRKR_@b@Yj@AXGTUCUBc@RQEs@g@",
+    "average_heartrate": 139.4,
+    "average_speed": 2.866,
+    "streak": 1
   }
 ];
 
